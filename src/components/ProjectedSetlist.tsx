@@ -16,9 +16,6 @@ export function ProjectedSetlist() {
     }
 
     const fetchData = async () => {
-        console.log("setlist metadata");
-        console.log(setlistMetadata)
-        console.log(token)
         try {
             const response = await fetch(
                 `http://localhost:3000/playlists`, {
