@@ -14,10 +14,9 @@ function App() {
 
   const [token, setToken] = useState("")
 
-  const clientId = "d74b3ce0fbf342ecbfc8b32423800fa2";
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
-
+  const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
+  const urlParams = new URLSearchParams(window.location.search);
+  let code: any | null = urlParams.get('code');
   const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
@@ -26,7 +25,39 @@ function App() {
       if (!code) {
         redirectToAuthCodeFlow(clientId);
       } else {
-        getAccessToken(clientId, code);
+        getAccessToken();
+      }
+
+      async function getAccessToken() {
+
+        // client_id: clientId,
+        // grant_type: 'authorization_code',
+        // code: code ?? '', // If code is null, use an empty string
+        // redirect_uri: redirectUri,
+        // code_verifier: codeVerifier,
+
+        // stored in the previous step
+        const codeVerifier: string | null = localStorage.getItem('code_verifier');
+
+        const payload: RequestInit = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: clientId,
+            grant_type: 'authorization_code',
+            code: code ?? '',
+            redirect_uri: CALLBACK_URL,
+            code_verifier: codeVerifier ?? ''
+          }),
+        };
+
+        const body = await fetch("https://accounts.spotify.com/api/token", payload);
+        const response = await body.json();
+
+        localStorage.setItem('access_token', response.access_token);
+        setToken(response.access_token);
       }
 
       async function redirectToAuthCodeFlow(clientId: string) {
@@ -52,8 +83,6 @@ function App() {
 
         authUrl.search = new URLSearchParams(params).toString();
         window.location.href = authUrl.toString();
-
-        document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
       }
 
       const generateRandomString = (length: number) => {
@@ -69,33 +98,8 @@ function App() {
       }
 
       const base64urlencode = (a: any) => {
-        // Convert the ArrayBuffer to string using Uint8 array.
-        // btoa takes chars from 0-255 and base64 encodes.
-        // Then convert the base64 encoded to base64url encoded.
-        // (replace + with -, replace / with _, trim trailing =)
         return btoa(String.fromCharCode.apply(null, new Uint8Array(a) as unknown as number[]))
           .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      }
-
-      async function getAccessToken(clientId: string, code: string) {
-        const code_verifier = localStorage.getItem("code_verifier");
-
-        const params = new URLSearchParams();
-        params.append("client_id", clientId);
-        params.append("grant_type", "authorization_code");
-        params.append("code", code);
-        params.append("redirect_uri", CALLBACK_URL);
-        params.append("code_verifier", code_verifier!);
-
-        const result = await fetch("https://accounts.spotify.com/api/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: params
-        });
-
-        await result.json().then(res => {
-          setToken(res.access_token);
-        });
       }
     }
   }, []);
