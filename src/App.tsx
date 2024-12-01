@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
 import { StepHeader } from './components/StepHeader';
