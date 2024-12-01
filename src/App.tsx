@@ -84,10 +84,8 @@ function App() {
           .replace(/\//g, '_');
       }
 
-        
-
       const hashed = generateRandomString(64)
-      const codeChallenge = generateCodeChallenge(hashed);
+      const codeChallenge = await generateCodeChallenge(hashed);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
       const authUrl = new URL(authorizationEndpoint)
