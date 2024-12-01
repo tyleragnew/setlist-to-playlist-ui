@@ -63,14 +63,6 @@ function App() {
           return values.reduce((acc, x) => acc + possible[x % possible.length], "");
         }
 
-        const codeVerifier = generateRandomString(64);
-
-        const sha256 = async (plain: any) => {
-          const encoder = new TextEncoder()
-          const data = encoder.encode(plain)
-          return window.crypto.subtle.digest('SHA-256', data)
-        }
-
         const base64encode = (input: any) => {
           return btoa(String.fromCharCode(...new Uint8Array(input)))
             .replace(/=/g, '')
@@ -78,8 +70,8 @@ function App() {
             .replace(/\//g, '_');
         }
 
-        const hashed = await sha256(codeVerifier)
-        const codeChallenge = base64encode(hashed);
+        const codeVerifier = base64encode(generateRandomString(64));
+        const codeChallenge = base64encode(codeVerifier);
 
         const scope = 'user-read-private user-read-email';
         const authUrl = new URL("https://accounts.spotify.com/authorize")
