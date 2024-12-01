@@ -33,7 +33,7 @@ function App() {
         const verifier = generateCodeVerifier(128);
         const challenge = await generateCodeChallenge(verifier);
 
-        sessionStorage.setItem("verifier", verifier);
+        localStorage.setItem("verifier", verifier);
 
         const params = new URLSearchParams();
         params.append("client_id", clientId);
@@ -47,9 +47,8 @@ function App() {
       }
 
       function generateCodeVerifier(length: number) {
+        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
         let text = '';
-        let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
         for (let i = 0; i < length; i++) {
           text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
@@ -66,7 +65,7 @@ function App() {
       }
 
       async function getAccessToken(clientId: string, code: string) {
-        const verifier = sessionStorage.getItem("verifier");
+        const verifier = localStorage.getItem("verifier");
 
         const params = new URLSearchParams();
         params.append("client_id", clientId);
