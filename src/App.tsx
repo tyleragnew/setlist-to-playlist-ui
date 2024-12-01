@@ -66,24 +66,31 @@ function App() {
         const values = crypto.getRandomValues(new Uint8Array(length));
         return values.reduce((acc, x) => acc + possible[x % possible.length], "");
       }
-      
-      const codeVerifier  = generateRandomString(64);
-      
+
+      const codeVerifier = generateRandomString(64);
+
       const sha256 = async (plain: any) => {
         const encoder = new TextEncoder()
         const data = encoder.encode(plain)
         return window.crypto.subtle.digest('SHA-256', data)
       }
 
-      const base64encode = (input: any) => {
-        return btoa(String.fromCharCode(...new Uint8Array(input)))
-          .replace(/=/g, '')
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_');
-      }
+      const base64encode = (input: ArrayBuffer | Uint8Array): string => {
+        // If input is an ArrayBuffer, convert it to Uint8Array
+        const uint8Array = input instanceof Uint8Array ? input : new Uint8Array(input);
+
+        // Convert the Uint8Array to a binary string
+        const string = String.fromCharCode.apply(null, Array.from(uint8Array));
+
+        // Base64 encode and make URL-safe
+        return btoa(string)
+          .replace(/\+/g, '-') // Replace '+' with '-'
+          .replace(/\//g, '_') // Replace '/' with '_'
+          .replace(/=+$/, '');  // Remove any trailing '='
+      };
 
       const hashed = await sha256(codeVerifier)
-      const codeChallenge = base64encode(hashed);      
+      const codeChallenge = base64encode(hashed);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
       const authUrl = new URL(authorizationEndpoint)
