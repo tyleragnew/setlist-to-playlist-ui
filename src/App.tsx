@@ -33,7 +33,7 @@ function App() {
 
         const codeVerifier = generateRandomString(64);
         const hashed = await sha256(codeVerifier)
-        const codeChallenge = base64encode(hashed);
+        const codeChallenge = base64urlencode(hashed);
 
         const scope = 'user-read-private user-read-email';
         const authUrl = new URL("https://accounts.spotify.com/authorize")
@@ -68,11 +68,13 @@ function App() {
         return window.crypto.subtle.digest('SHA-256', data)
       }
 
-      const base64encode = (input: any) => {
-        return btoa(String.fromCharCode(...new Uint8Array(input)))
-          .replace(/=/g, '')
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_');
+      const base64urlencode = (a: any) => {
+        // Convert the ArrayBuffer to string using Uint8 array.
+        // btoa takes chars from 0-255 and base64 encodes.
+        // Then convert the base64 encoded to base64url encoded.
+        // (replace + with -, replace / with _, trim trailing =)
+        return btoa(String.fromCharCode.apply(null, new Uint8Array(a) as unknown as number[]))
+          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       }
 
       async function getAccessToken(clientId: string, code: string) {
