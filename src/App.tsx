@@ -23,8 +23,11 @@ function App() {
     if (!token) {
       console.log("No Token")
       if (!code) {
+        console.log("No Code...getting access Token")
         redirectToAuthCodeFlow(clientId);
+        getAccessToken();
       } else {
+        console.log("Yes Code: " + code)
         getAccessToken();
       }
 
