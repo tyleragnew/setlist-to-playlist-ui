@@ -15,92 +15,85 @@ function App() {
   const [token, setToken] = useState("")
 
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
-  const urlParams = new URLSearchParams(window.location.search);
-  let code: any | null = urlParams.get('code');
   const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
-    if (!token) {
-      console.log("No Token")
-      if (true) {
-        console.log("Testing")
-        generateCodeVerifier(clientId);
-        getAccessToken();
-      } else {
-        console.log("Yes Code: " + code)
-      }
+    if (!localStorage.getItem('code_verifier')) {
+      generateCodeVerifier(clientId);
+    } else {
+      getAccessToken();
+    }
 
-      async function getAccessToken() {
+    async function getAccessToken() {
 
-        console.log("getting access token")
+      console.log("getting access token")
 
-        const urlParams = new URLSearchParams(window.location.search);
-        let code = urlParams.get('code');
-        let codeVerifier = localStorage.getItem('code_verifier');
+      const urlParams = new URLSearchParams(window.location.search);
+      let code = urlParams.get('code');
+      let codeVerifier = localStorage.getItem('code_verifier');
 
-        const payload: RequestInit = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            client_id: clientId,
-            grant_type: 'authorization_code',
-            code: code ?? '',
-            redirect_uri: CALLBACK_URL,
-            code_verifier: codeVerifier ?? ''
-          }),
-        };
-
-        const body = await fetch("https://accounts.spotify.com/api/token", payload);
-        const response = await body.json();
-
-        console.log("API Token response: " + response)
-
-        localStorage.setItem('access_token', response.access_token);
-        setToken(response.access_token);
-      }
-
-      async function generateCodeVerifier(clientId: string) {
-
-        // Generate a random code verifier
-        const generateCodeVerifier = () => {
-          const array = new Uint32Array(56); // 56 random bytes
-          window.crypto.getRandomValues(array);
-          return Array.from(array, dec => dec.toString(36)).join('');
-        }
-
-        async function generateCodeChallenge(codeVerifier: string): Promise<string> {
-          const encoded = new TextEncoder().encode(codeVerifier);
-          const hashed = await crypto.subtle.digest('SHA-256', encoded);
-
-          // Convert the hash to a Base64-encoded string and make it URL-safe
-          return btoa(String.fromCharCode(...new Uint8Array(hashed))) // Base64 encode
-            .replace(/\+/g, '-') // URL-safe encoding
-            .replace(/\//g, '_') // URL-safe encoding
-            .replace(/=+$/, ''); // Remove trailing '='
-        }
-
-        const codeVerifier = generateCodeVerifier();
-        const codeChallenge = await generateCodeChallenge(codeVerifier);
-
-        const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
-        const authUrl = new URL("https://accounts.spotify.com/authorize")
-
-        window.localStorage.setItem('code_verifier', codeVerifier);
-
-        const params = {
-          response_type: 'code',
+      const payload: RequestInit = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
           client_id: clientId,
-          scope,
-          code_challenge_method: 'S256',
-          code_challenge: codeChallenge,
+          grant_type: 'authorization_code',
+          code: code ?? '',
           redirect_uri: CALLBACK_URL,
-        }
+          code_verifier: codeVerifier ?? ''
+        }),
+      };
 
-        authUrl.search = new URLSearchParams(params).toString();
-        window.location.href = authUrl.toString();
+      const body = await fetch("https://accounts.spotify.com/api/token", payload);
+      const response = await body.json();
+
+      console.log("API Token response: " + response)
+
+      localStorage.setItem('access_token', response.access_token);
+      setToken(response.access_token);
+    }
+
+    async function generateCodeVerifier(clientId: string) {
+
+      // Generate a random code verifier
+      const generateCodeVerifier = () => {
+        const array = new Uint32Array(56); // 56 random bytes
+        window.crypto.getRandomValues(array);
+        return Array.from(array, dec => dec.toString(36)).join('');
       }
+
+      async function generateCodeChallenge(codeVerifier: string): Promise<string> {
+        const encoded = new TextEncoder().encode(codeVerifier);
+        const hashed = await crypto.subtle.digest('SHA-256', encoded);
+
+        // Convert the hash to a Base64-encoded string and make it URL-safe
+        return btoa(String.fromCharCode(...new Uint8Array(hashed))) // Base64 encode
+          .replace(/\+/g, '-') // URL-safe encoding
+          .replace(/\//g, '_') // URL-safe encoding
+          .replace(/=+$/, ''); // Remove trailing '='
+      }
+
+      const codeVerifier = generateCodeVerifier();
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+      const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
+      const authUrl = new URL("https://accounts.spotify.com/authorize")
+
+      window.localStorage.setItem('code_verifier', codeVerifier);
+
+      const params = {
+        response_type: 'code',
+        client_id: clientId,
+        scope,
+        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+        redirect_uri: CALLBACK_URL,
+      }
+
+      authUrl.search = new URLSearchParams(params).toString();
+      window.location.href = authUrl.toString();
     }
   }, []);
 
