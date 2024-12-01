@@ -30,14 +30,9 @@ function App() {
 
       async function getAccessToken() {
 
-        // client_id: clientId,
-        // grant_type: 'authorization_code',
-        // code: code ?? '', // If code is null, use an empty string
-        // redirect_uri: redirectUri,
-        // code_verifier: codeVerifier,
-
-        // stored in the previous step
-        const codeVerifier: string | null = localStorage.getItem('code_verifier');
+        const urlParams = new URLSearchParams(window.location.search);
+        let code = urlParams.get('code');
+        let codeVerifier = localStorage.getItem('code_verifier');
 
         const payload: RequestInit = {
           method: 'POST',
@@ -62,14 +57,33 @@ function App() {
 
       async function redirectToAuthCodeFlow(clientId: string) {
 
+        const generateRandomString = (length: number) => {
+          const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          const values = crypto.getRandomValues(new Uint8Array(length));
+          return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+        }
+
         const codeVerifier = generateRandomString(64);
+
+        const sha256 = async (plain: any) => {
+          const encoder = new TextEncoder()
+          const data = encoder.encode(plain)
+          return window.crypto.subtle.digest('SHA-256', data)
+        }
+
+        const base64encode = (input: any) => {
+          return btoa(String.fromCharCode(...new Uint8Array(input)))
+            .replace(/=/g, '')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_');
+        }
+
         const hashed = await sha256(codeVerifier)
-        const codeChallenge = base64urlencode(hashed);
+        const codeChallenge = base64encode(hashed);
 
         const scope = 'user-read-private user-read-email';
         const authUrl = new URL("https://accounts.spotify.com/authorize")
 
-        // generated in the previous step
         window.localStorage.setItem('code_verifier', codeVerifier);
 
         const params = {
@@ -83,23 +97,6 @@ function App() {
 
         authUrl.search = new URLSearchParams(params).toString();
         window.location.href = authUrl.toString();
-      }
-
-      const generateRandomString = (length: number) => {
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const values = crypto.getRandomValues(new Uint8Array(length));
-        return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-      }
-
-      const sha256 = async (plain: string) => {
-        const encoder = new TextEncoder()
-        const data = encoder.encode(plain)
-        return window.crypto.subtle.digest('SHA-256', data)
-      }
-
-      const base64urlencode = (a: any) => {
-        return btoa(String.fromCharCode.apply(null, new Uint8Array(a) as unknown as number[]))
-          .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       }
     }
   }, []);
