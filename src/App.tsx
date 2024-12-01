@@ -16,7 +16,7 @@ function App() {
 
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
   const authorizationEndpoint = "https://accounts.spotify.com/authorize";
-  const tokenEndpoint = "https://accounts.spotify.com/api/token";
+  const tokenEndpoint = "https://accounts.spotify.com/authorize";
   const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
@@ -63,16 +63,16 @@ function App() {
       const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       const randomValues = crypto.getRandomValues(new Uint8Array(64));
       const randomString = randomValues.reduce((acc, x) => acc + possible[x % possible.length], "");
-    
+
       const code_verifier = randomString;
       const data = new TextEncoder().encode(code_verifier);
       const hashed = await crypto.subtle.digest('SHA-256', data);
-    
+
       const code_challenge_base64 = btoa(String.fromCharCode(...new Uint8Array(hashed)))
         .replace(/=/g, '')
         .replace(/\+/g, '-')
         .replace(/\//g, '_');
-    
+
       window.localStorage.setItem('code_verifier', code_verifier);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
