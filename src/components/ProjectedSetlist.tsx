@@ -18,7 +18,7 @@ export function ProjectedSetlist() {
     const fetchData = async () => {
         try {
             const response = await fetch(
-                `http://localhost:3000/playlists`, {
+                `https://setlist-to-playlist-api.vercel.app/playlists`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ export function SetSetlistMetadata() {
     const fetchData = async () => {
         try {
             const response = await fetch(
-                `http://localhost:3000/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=20`
+                `https://setlist-to-playlist-api.vercel.app/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=20`
             );
             const jsonData = await response.json();
             setSetlistMetadata(jsonData);
