@@ -30,6 +30,8 @@ function App() {
 
       async function getAccessToken() {
 
+        console.log("getting access token")
+
         const urlParams = new URLSearchParams(window.location.search);
         let code = urlParams.get('code');
         let codeVerifier = localStorage.getItem('code_verifier');
@@ -50,6 +52,8 @@ function App() {
 
         const body = await fetch("https://accounts.spotify.com/api/token", payload);
         const response = await body.json();
+
+        console.log("API Token response: " + response)
 
         localStorage.setItem('access_token', response.access_token);
         setToken(response.access_token);
@@ -73,7 +77,10 @@ function App() {
         const codeVerifier = base64encode(generateRandomString(64));
         const codeChallenge = base64encode(codeVerifier);
 
-        const scope = 'user-read-private user-read-email';
+        console.log("Verifier: " + codeVerifier)
+        console.log("Code Challenge: " + codeChallenge)
+
+        const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
         const authUrl = new URL("https://accounts.spotify.com/authorize")
 
         window.localStorage.setItem('code_verifier', codeVerifier);
