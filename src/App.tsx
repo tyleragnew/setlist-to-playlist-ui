@@ -16,14 +16,14 @@ function App() {
 
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
   const authorizationEndpoint = "https://accounts.spotify.com/authorize";
-  const tokenEndpoint = "https://accounts.spotify.com/authorize";
+  const tokenEndpoint = "https://accounts.spotify.com/api/token";
   const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
+  let postAuthorization: string | null = localStorage.getItem("post_authorization")
 
   useEffect(() => {
-    if (!localStorage.getItem('code_verifier')) {
-      console.log("c")
+    if (!localStorage.getItem('code_verifier') && (!postAuthorization || postAuthorization === 'no')) {
       generateCodeVerifier(clientId);
-    } else {
+    } else if (postAuthorization = 'yes') {
       getAccessToken();
     }
 
@@ -56,6 +56,7 @@ function App() {
 
       localStorage.setItem('access_token', response.access_token);
       setToken(response.access_token);
+      localStorage.setItem('post_authorization', "no"); // Can now connect directly with the access token
     }
 
     async function generateCodeVerifier(clientId: string) {
@@ -73,22 +74,21 @@ function App() {
         .replace(/\+/g, '-')
         .replace(/\//g, '_');
 
+      console.log("Setting Code Verifier");
       window.localStorage.setItem('code_verifier', code_verifier);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
       const authUrl = new URL(authorizationEndpoint)
-
       const params = {
         response_type: 'code',
         client_id: clientId,
-        scope,
+        scope: scope,
         code_challenge_method: 'S256',
         code_challenge: code_challenge_base64,
         redirect_uri: callbackURL,
-      }
-
+      };
       authUrl.search = new URLSearchParams(params).toString();
-      window.location.href = authUrl.toString();
+      window.location.href = authUrl.toString(); // Redirect the user to the authorization server for login
     }
   }, []);
 
