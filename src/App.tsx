@@ -61,24 +61,26 @@ function App() {
 
       async function redirectToAuthCodeFlow(clientId: string) {
 
-        const generateRandomString = (length: number) => {
-          const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-          const values = crypto.getRandomValues(new Uint8Array(length));
-          return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+        // Generate a random code verifier
+        const generateCodeVerifier = () => {
+          const array = new Uint32Array(56); // 56 random bytes
+          window.crypto.getRandomValues(array);
+          return Array.from(array, dec => dec.toString(36)).join('');
         }
 
-        const base64encode = (input: any) => {
-          return btoa(String.fromCharCode(...new Uint8Array(input)))
-            .replace(/=/g, '')
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_');
+        async function generateCodeChallenge(codeVerifier: string): Promise<string> {
+          const encoded = new TextEncoder().encode(codeVerifier);
+          const hashed = await crypto.subtle.digest('SHA-256', encoded);
+
+          // Convert the hash to a Base64-encoded string and make it URL-safe
+          return btoa(String.fromCharCode(...new Uint8Array(hashed))) // Base64 encode
+            .replace(/\+/g, '-') // URL-safe encoding
+            .replace(/\//g, '_') // URL-safe encoding
+            .replace(/=+$/, ''); // Remove trailing '='
         }
 
-        const codeVerifier = base64encode(generateRandomString(64));
-        const codeChallenge = base64encode(codeVerifier);
-
-        console.log("Verifier: " + codeVerifier)
-        console.log("Code Challenge: " + codeChallenge)
+        const codeVerifier = generateCodeVerifier();
+        const codeChallenge = await generateCodeChallenge(codeVerifier);
 
         const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
         const authUrl = new URL("https://accounts.spotify.com/authorize")
