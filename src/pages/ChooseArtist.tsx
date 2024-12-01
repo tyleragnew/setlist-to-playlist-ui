@@ -22,7 +22,7 @@ export function ChooseArtist() {
     const fetchData = async () => {
         try {
             const response = await fetch(
-                `http://localhost:3000/artists?artist=${artistInput}`
+                `https://setlist-to-playlist-api.vercep.app/artists?artist=${artistInput}`
             );
             const jsonData = await response.json();
             setListofArtists(jsonData);

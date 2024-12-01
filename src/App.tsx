@@ -18,7 +18,7 @@ function App() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
 
-  const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
+  const CALLBACK_URL = "http://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
     if (!token) {
