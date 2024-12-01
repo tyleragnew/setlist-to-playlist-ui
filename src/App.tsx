@@ -15,10 +15,13 @@ function App() {
   const [token, setToken] = useState("")
 
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
-  const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
+  const authorizationEndpoint = "https://accounts.spotify.com/authorize";
+  const tokenEndpoint = "https://accounts.spotify.com/api/token";
+  const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
     if (!localStorage.getItem('code_verifier')) {
+      console.log("c")
       generateCodeVerifier(clientId);
     } else {
       getAccessToken();
@@ -41,12 +44,12 @@ function App() {
           client_id: clientId,
           grant_type: 'authorization_code',
           code: code ?? '',
-          redirect_uri: CALLBACK_URL,
+          redirect_uri: callbackURL,
           code_verifier: codeVerifier ?? ''
         }),
       };
 
-      const body = await fetch("https://accounts.spotify.com/api/token", payload);
+      const body = await fetch(tokenEndpoint, payload);
       const response = await body.json();
 
       console.log("API Token response: " + response)
@@ -57,39 +60,31 @@ function App() {
 
     async function generateCodeVerifier(clientId: string) {
 
-      // Generate a random code verifier
-      const generateCodeVerifier = () => {
-        const array = new Uint32Array(56); // 56 random bytes
-        window.crypto.getRandomValues(array);
-        return Array.from(array, dec => dec.toString(36)).join('');
-      }
-
-      async function generateCodeChallenge(codeVerifier: string): Promise<string> {
-        const encoded = new TextEncoder().encode(codeVerifier);
-        const hashed = await crypto.subtle.digest('SHA-256', encoded);
-
-        // Convert the hash to a Base64-encoded string and make it URL-safe
-        return btoa(String.fromCharCode(...new Uint8Array(hashed))) // Base64 encode
-          .replace(/\+/g, '-') // URL-safe encoding
-          .replace(/\//g, '_') // URL-safe encoding
-          .replace(/=+$/, ''); // Remove trailing '='
-      }
-
-      const codeVerifier = generateCodeVerifier();
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
+      const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const randomValues = crypto.getRandomValues(new Uint8Array(64));
+      const randomString = randomValues.reduce((acc, x) => acc + possible[x % possible.length], "");
+    
+      const code_verifier = randomString;
+      const data = new TextEncoder().encode(code_verifier);
+      const hashed = await crypto.subtle.digest('SHA-256', data);
+    
+      const code_challenge_base64 = btoa(String.fromCharCode(...new Uint8Array(hashed)))
+        .replace(/=/g, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+    
+      window.localStorage.setItem('code_verifier', code_verifier);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
-      const authUrl = new URL("https://accounts.spotify.com/authorize")
-
-      window.localStorage.setItem('code_verifier', codeVerifier);
+      const authUrl = new URL(authorizationEndpoint)
 
       const params = {
         response_type: 'code',
         client_id: clientId,
         scope,
         code_challenge_method: 'S256',
-        code_challenge: codeChallenge,
-        redirect_uri: CALLBACK_URL,
+        code_challenge: code_challenge_base64,
+        redirect_uri: callbackURL,
       }
 
       authUrl.search = new URLSearchParams(params).toString();
