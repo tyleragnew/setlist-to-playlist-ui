@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
 import { StepHeader } from './components/StepHeader';
@@ -12,83 +12,81 @@ export const ListenerContext = React.createContext(null);
 
 function App() {
 
-  // const [token, setToken] = useState("")
+  const [token, setToken] = useState("")
 
-  // const clientId = "d74b3ce0fbf342ecbfc8b32423800fa2";
-  // const params = new URLSearchParams(window.location.search);
-  // const code = params.get("code");
+  const clientId = "d74b3ce0fbf342ecbfc8b32423800fa2";
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
 
-  // const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
+  const CALLBACK_URL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
-  // useEffect(() => {
-  //   if (!token) {
-  //     console.log("No Token")
-  //     if (!code) {
-  //       redirectToAuthCodeFlow(clientId);
-  //     } else {
-  //       getAccessToken(clientId, code);
-  //     }
+  useEffect(() => {
+    if (!token) {
+      console.log("No Token")
+      if (!code) {
+        redirectToAuthCodeFlow(clientId);
+      } else {
+        getAccessToken(clientId, code);
+      }
 
-  //     async function redirectToAuthCodeFlow(clientId: string) {
-  //       const verifier = generateCodeVerifier(128);
-  //       const challenge = await generateCodeChallenge(verifier);
+      async function redirectToAuthCodeFlow(clientId: string) {
+        const verifier = generateCodeVerifier(128);
+        const challenge = await generateCodeChallenge(verifier);
 
-  //       localStorage.setItem("verifier", verifier);
+        localStorage.setItem("verifier", verifier);
 
-  //       const params = new URLSearchParams();
-  //       params.append("client_id", clientId);
-  //       params.append("response_type", "code");
-  //       params.append("redirect_uri", CALLBACK_URL);
-  //       params.append("scope", "user-read-private user-read-email playlist-modify-public playlist-modify-private");
-  //       params.append("code_challenge_method", "S256");
-  //       params.append("code_challenge", challenge);
+        const params = new URLSearchParams();
+        params.append("client_id", clientId);
+        params.append("response_type", "code");
+        params.append("redirect_uri", CALLBACK_URL);
+        params.append("scope", "user-read-private user-read-email playlist-modify-public playlist-modify-private");
+        params.append("code_challenge_method", "S256");
+        params.append("code_challenge", challenge);
 
-  //       document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
-  //     }
+        document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+      }
 
-  //     function generateCodeVerifier(length: number) {
-  //       let text = '';
-  //       let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      function generateCodeVerifier(length: number) {
+        let text = '';
+        let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-  //       for (let i = 0; i < length; i++) {
-  //         text += possible.charAt(Math.floor(Math.random() * possible.length));
-  //       }
-  //       return text;
-  //     }
+        for (let i = 0; i < length; i++) {
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+      }
 
-  //     async function generateCodeChallenge(codeVerifier: string) {
-  //       const data = new TextEncoder().encode(codeVerifier);
-  //       const digest = await window.crypto.subtle.digest('SHA-256', data);
-  //       return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
-  //         .replace(/\+/g, '-')
-  //         .replace(/\//g, '_')
-  //         .replace(/=+$/, '');
-  //     }
+      async function generateCodeChallenge(codeVerifier: string) {
+        const data = new TextEncoder().encode(codeVerifier);
+        const digest = await window.crypto.subtle.digest('SHA-256', data);
+        return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '');
+      }
 
-  //     async function getAccessToken(clientId: string, code: string) {
-  //       const verifier = localStorage.getItem("verifier");
+      async function getAccessToken(clientId: string, code: string) {
+        const verifier = localStorage.getItem("verifier");
 
-  //       const params = new URLSearchParams();
-  //       params.append("client_id", clientId);
-  //       params.append("grant_type", "authorization_code");
-  //       params.append("code", code);
-  //       params.append("redirect_uri", CALLBACK_URL);
-  //       params.append("code_verifier", verifier!);
+        const params = new URLSearchParams();
+        params.append("client_id", clientId);
+        params.append("grant_type", "authorization_code");
+        params.append("code", code);
+        params.append("redirect_uri", CALLBACK_URL);
+        params.append("code_verifier", verifier!);
 
-  //       const result = await fetch("https://accounts.spotify.com/api/token", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  //         body: params
-  //       });
+        const result = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: params
+        });
 
-  //       await result.json().then(res => {
-  //         setToken(res.access_token);
-  //       });
-  //     }
-  //   }
-  // }, []);
-
-  const token = '1';
+        await result.json().then(res => {
+          setToken(res.access_token);
+        });
+      }
+    }
+  }, []);
 
   const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>();
   const [playlistMetadata, setPlaylistMetadata] = useState<any>();
