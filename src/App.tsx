@@ -61,36 +61,33 @@ function App() {
 
     async function generateCodeVerifier(clientId: string) {
 
-      const generateRandomString = (length: number) => {
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const values = crypto.getRandomValues(new Uint8Array(length));
-        return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+      function generateRandomString(length: number) {
+        let text = '';
+        const possible =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    
+        for (let i = 0; i < length; i++) {
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+      }
+    
+      async function generateCodeChallenge(codeVerifier: any) {
+        const digest = await crypto.subtle.digest(
+          'SHA-256',
+          new TextEncoder().encode(codeVerifier),
+        );
+    
+        return btoa(String.fromCharCode(...new Uint8Array(digest)))
+          .replace(/=/g, '')
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_');
       }
 
-      const codeVerifier = generateRandomString(64);
+        
 
-      const sha256 = async (plain: any) => {
-        const encoder = new TextEncoder()
-        const data = encoder.encode(plain)
-        return window.crypto.subtle.digest('SHA-256', data)
-      }
-
-      const base64encode = (input: ArrayBuffer | Uint8Array): string => {
-        // If input is an ArrayBuffer, convert it to Uint8Array
-        const uint8Array = input instanceof Uint8Array ? input : new Uint8Array(input);
-
-        // Convert the Uint8Array to a binary string
-        const string = String.fromCharCode.apply(null, Array.from(uint8Array));
-
-        // Base64 encode and make URL-safe
-        return btoa(string)
-          .replace(/\+/g, '-') // Replace '+' with '-'
-          .replace(/\//g, '_') // Replace '/' with '_'
-          .replace(/=+$/, '');  // Remove any trailing '='
-      };
-
-      const hashed = await sha256(codeVerifier)
-      const codeChallenge = base64encode(hashed);
+      const hashed = generateRandomString(64)
+      const codeChallenge = generateCodeChallenge(hashed);
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
       const authUrl = new URL(authorizationEndpoint)
