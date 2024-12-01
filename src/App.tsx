@@ -30,7 +30,7 @@ function App() {
       }
 
       async function redirectToAuthCodeFlow(clientId: string) {
-        const verifier = generateCodeVerifier(128);
+        const verifier = generateCodeVerifier(256);
         const challenge = await generateCodeChallenge(verifier);
 
         localStorage.setItem("verifier", verifier);
