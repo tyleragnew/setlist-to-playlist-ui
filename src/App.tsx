@@ -22,13 +22,12 @@ function App() {
   useEffect(() => {
     if (!token) {
       console.log("No Token")
-      if (!code) {
-        console.log("No Code...getting access Token")
-        redirectToAuthCodeFlow(clientId);
+      if (true) {
+        console.log("Testing")
+        generateCodeVerifier(clientId);
         getAccessToken();
       } else {
         console.log("Yes Code: " + code)
-        getAccessToken();
       }
 
       async function getAccessToken() {
@@ -62,7 +61,7 @@ function App() {
         setToken(response.access_token);
       }
 
-      async function redirectToAuthCodeFlow(clientId: string) {
+      async function generateCodeVerifier(clientId: string) {
 
         // Generate a random code verifier
         const generateCodeVerifier = () => {
