@@ -1,0 +1,20 @@
+name: setlist-to-playlist-ui build and test
+on: [push]
+jobs:
+
+  Lint:
+    runs-on: ubuntu-latest
+    steps: 
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22.11.0
+          
+      - run: npm install
+
+      # Reintroduce after fixing ts-ignores
+      # - run: npm run lint
+
+      - run: npm run test
