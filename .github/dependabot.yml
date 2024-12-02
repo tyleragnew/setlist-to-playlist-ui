@@ -1,17 +1,17 @@
+# Basic set up for three package managers
+
 version: 2
 updates:
 
-  # Group: GitHub Actions
-  - group-name: "GitHub Actions Dependencies"
-    package-ecosystem: "github-actions"
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
 
-  # Group: npm
-  - group-name: "npm Dependencies"
-    package-ecosystem: "npm"
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 10 
