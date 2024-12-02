@@ -17,20 +17,16 @@ function App() {
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
   const authorizationEndpoint = "https://accounts.spotify.com/authorize";
   const tokenEndpoint = "https://accounts.spotify.com/api/token";
-  const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
-  let postAuthorization: string | null = localStorage.getItem("post_authorization")
+  const callbackURL = "http://localhost:3000/callback"
 
   useEffect(() => {
-    if (!localStorage.getItem('code_verifier') && (!postAuthorization || postAuthorization === 'no')) {
+    if (!localStorage.getItem('code_verifier')) {
       generateCodeVerifier(clientId);
-    } else if (postAuthorization = 'yes') {
+    } else {
       getAccessToken();
     }
 
     async function getAccessToken() {
-
-      console.log("getting access token")
-
       const urlParams = new URLSearchParams(window.location.search);
       let code = urlParams.get('code');
       let codeVerifier = localStorage.getItem('code_verifier');
@@ -52,11 +48,8 @@ function App() {
       const body = await fetch(tokenEndpoint, payload);
       const response = await body.json();
 
-      console.log("API Token response: " + response)
-
       localStorage.setItem('access_token', response.access_token);
       setToken(response.access_token);
-      localStorage.setItem('post_authorization', "no"); // Can now connect directly with the access token
     }
 
     async function generateCodeVerifier(clientId: string) {
@@ -65,19 +58,19 @@ function App() {
         let text = '';
         const possible =
           'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    
+
         for (let i = 0; i < length; i++) {
           text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
         return text;
       }
-    
+
       async function generateCodeChallenge(codeVerifier: any) {
         const digest = await crypto.subtle.digest(
           'SHA-256',
           new TextEncoder().encode(codeVerifier),
         );
-    
+
         return btoa(String.fromCharCode(...new Uint8Array(digest)))
           .replace(/=/g, '')
           .replace(/\+/g, '-')
@@ -86,6 +79,9 @@ function App() {
 
       const hashed = generateRandomString(64)
       const codeChallenge = await generateCodeChallenge(hashed);
+
+      // Store code_verifier for use in getting an access token
+      localStorage.setItem('code_verifier', hashed)
 
       const scope = "user-read-private user-read-email playlist-modify-public playlist-modify-private";
       const authUrl = new URL(authorizationEndpoint)
