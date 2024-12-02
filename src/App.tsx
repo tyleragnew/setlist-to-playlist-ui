@@ -17,7 +17,7 @@ function App() {
   const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
   const authorizationEndpoint = "https://accounts.spotify.com/authorize";
   const tokenEndpoint = "https://accounts.spotify.com/api/token";
-  const callbackURL = "http://localhost:3000/callback"
+  const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
 
   useEffect(() => {
     if (!localStorage.getItem('code_verifier')) {
