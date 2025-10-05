@@ -1,6 +1,7 @@
 import { Input, SimpleGrid } from "@chakra-ui/react";
-import { Key, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
+
 
 export type ArtistMetadata = {
     artistName: string
@@ -16,9 +17,17 @@ export function ChooseArtist() {
     // Component State
     const [artistInput, setArtistInput] = useState('');
 
-    const handleChange = (event: any) => setArtistInput(event.target.value)
+    const handleChange = async (event: any) => {
+        setArtistInput(event.target.value)
+    }
 
-    // @TODO - add debouncing here instead of using OnBlur event.
+    useEffect(() => {
+        const debounceTimeout = setTimeout(() => {
+            fetchData()
+        }, 400);
+        return () => clearTimeout(debounceTimeout);
+    }, [artistInput]);
+
     const fetchData = async () => {
         try {
             const response = await fetch(
@@ -39,7 +48,6 @@ export function ChooseArtist() {
                 value={artistInput}
                 placeholder='i.e. Genesis...'
                 onChange={handleChange}
-                onBlur={fetchData}
                 size='sm'
             />
             <br />

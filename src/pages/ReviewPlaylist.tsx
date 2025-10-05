@@ -1,8 +1,11 @@
-import { AspectRatio, SimpleGrid, Spinner } from "@chakra-ui/react";
+import { AspectRatio, Button, SimpleGrid, Spinner } from "@chakra-ui/react";
 import { ListenerContext } from "../App"
 import { useContext } from 'react'
+import { useNavigate } from "react-router-dom";
 
 export function ReviewPlaylist() {
+
+    const navigate = useNavigate();
 
     // @ts-ignore
     const { setlistLoaded, setlist, chosenArtist, playlistMetadata } = useContext(ListenerContext);
@@ -38,6 +41,8 @@ export function ReviewPlaylist() {
                             <h3>All songs were mapped successfully!</h3>
                         </div>
                     }
+                    <br />
+                    <Button onClick={() => navigate('/callback')}>Create Another</Button>
                 </SimpleGrid>
             ) : (
                 <Spinner size='xl' />

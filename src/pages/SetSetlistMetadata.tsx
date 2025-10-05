@@ -1,4 +1,4 @@
-import { Button, FormControl, FormHelperText, FormLabel, Input, SimpleGrid } from "@chakra-ui/react";
+import { Button, FormControl, FormHelperText, FormLabel, Input, Radio, RadioGroup, SimpleGrid, Stack } from "@chakra-ui/react";
 import { useContext, useState } from "react";
 import { ListenerContext } from "../App";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
@@ -30,9 +30,19 @@ export function SetSetlistMetadata() {
             <SimpleGrid alignItems='center'>
                 <h1>{chosenArtist.artistName}</h1>
                 <FormControl>
-                    <FormLabel>Sets</FormLabel>
+                    <FormHelperText>Include the last X sets for {chosenArtist.artistName}</FormHelperText>
                     <Input type='number' />
-                    <FormHelperText>The last X sets for {chosenArtist.artistName}</FormHelperText>
+                    <RadioGroup defaultValue='1' alignItems='center'>
+                        <Stack spacing={4} direction='row'>
+                            <Radio value='1'>
+                                Include Songs on Tape
+                            </Radio>
+                            <Radio value='2'>
+                                Don't Include Songs on Tape
+                            </Radio>
+                        </Stack>
+                    </RadioGroup>
+                    <br />
                     <Button colorScheme="blue" onClick={fetchData}>Generate Projected Setlist</Button>
                 </FormControl>
                 <br />
