@@ -42,7 +42,9 @@ export function ProjectedSetlist() {
                 ))}
             </OrderedList>
             <br />
-            <Button onClick={handleClick}>Generate My Playlist!</Button>
+            <Button onClick={handleClick} isDisabled={!token} title={!token ? 'Sign in to Spotify to generate playlist' : undefined}>
+                Generate My Playlist!
+            </Button>
         </>
     );
 }
