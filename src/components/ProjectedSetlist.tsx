@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button, OrderedList, ListItem } from "@chakra-ui/react";
-import { useListenerContext } from "../App";
+import { useListenerContext } from "../context/ListenerContext";
 
 export function ProjectedSetlist() {
     const { setlistMetadata, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
@@ -37,7 +37,7 @@ export function ProjectedSetlist() {
     return (
         <>
             <OrderedList>
-                {(setlistMetadata?.songs ?? []).map((song, index) => (
+                {(setlistMetadata?.songs ?? []).map((song: string, index: number) => (
                     <ListItem key={index}>{song}</ListItem>
                 ))}
             </OrderedList>

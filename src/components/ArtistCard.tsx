@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, Flex, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { ArtistMetadata } from "../pages/ChooseArtist";
-import { useListenerContext } from "../App";
+import { useListenerContext } from "../context/ListenerContext";
 
 type ArtistCardProps = {
     artist: ArtistMetadata;

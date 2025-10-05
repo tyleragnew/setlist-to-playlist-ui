@@ -1,5 +1,5 @@
 import { AspectRatio, Button, SimpleGrid, Spinner } from "@chakra-ui/react";
-import { useListenerContext } from "../App";
+import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
 
 export function ReviewPlaylist() {
@@ -24,7 +24,7 @@ export function ReviewPlaylist() {
                     {(playlistMetadata?.unmappedSongs ?? []).length > 0 ? (
                         <div>
                             <h3>Unfortunately we weren't able to map the following songs...</h3>
-                            {(playlistMetadata?.unmappedSongs ?? []).map((i, index) => (
+                            {(playlistMetadata?.unmappedSongs ?? []).map((i: string, index: number) => (
                                 <p key={index}>{i}</p>
                             ))}
                         </div>

@@ -1,6 +1,6 @@
 import { Button, FormControl, FormHelperText, Input, Radio, RadioGroup, SimpleGrid, Stack } from "@chakra-ui/react";
 import { useState } from "react";
-import { useListenerContext } from "../App";
+import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
 
 export function SetSetlistMetadata() {
