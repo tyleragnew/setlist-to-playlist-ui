@@ -1,5 +1,5 @@
 import { Input, SimpleGrid } from "@chakra-ui/react";
-import { Key, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 
 
@@ -13,32 +13,32 @@ export type ArtistMetadata = {
 export function ChooseArtist() {
 
 
-    const [listOfArtists, setListofArtists] = useState<ArtistMetadata[]>();
+    const [listOfArtists, setListofArtists] = useState<ArtistMetadata[]>([]);
     // Component State
     const [artistInput, setArtistInput] = useState('');
 
-    const handleChange = async (event: any) => {
-        setArtistInput(event.target.value)
-    }
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setArtistInput(event.target.value);
+    };
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `https://setlist-to-playlist-api.vercel.app/artists?artist=${artistInput}`
+                );
+                const jsonData = await response.json();
+                setListofArtists(jsonData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
         const debounceTimeout = setTimeout(() => {
-            fetchData()
+            void fetchData();
         }, 400);
         return () => clearTimeout(debounceTimeout);
     }, [artistInput]);
-
-    const fetchData = async () => {
-        try {
-            const response = await fetch(
-                `https://setlist-to-playlist-api.vercel.app/artists?artist=${artistInput}`
-            );
-            const jsonData = await response.json();
-            setListofArtists(jsonData);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
 
     return (
         <>
@@ -53,12 +53,10 @@ export function ChooseArtist() {
             <br />
             <br />
             <SimpleGrid columns={3} spacing='5'>
-                {listOfArtists?.length ?? 0 ? (listOfArtists!.map((i: ArtistMetadata, index: Key | null | undefined) => (
-                    <ArtistCard
-                        key={index}
-                        artist={i}
-                    />
-                ))
+                {listOfArtists.length > 0 ? (
+                    listOfArtists.map((i, index) => (
+                        <ArtistCard key={index} artist={i} />
+                    ))
                 ) : (
                     <p>No data available.</p>
                 )}

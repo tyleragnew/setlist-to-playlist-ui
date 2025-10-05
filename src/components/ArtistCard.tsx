@@ -1,24 +1,23 @@
 import { Button, Card, CardBody, Flex, Text } from "@chakra-ui/react";
-import { ListenerContext } from "../App";
-import { useContext } from 'react'
 import { useNavigate } from "react-router-dom";
 import { ArtistMetadata } from "../pages/ChooseArtist";
+import { useListenerContext } from "../App";
 
-//@ts-ignore
-export function ArtistCard({ artist }) {
+type ArtistCardProps = {
+    artist: ArtistMetadata;
+};
 
+export function ArtistCard({ artist }: ArtistCardProps) {
     const navigate = useNavigate();
+    const { setChosenArtist } = useListenerContext();
 
-    const handleClick = (artist: ArtistMetadata) => {
-        setChosenArtist(artist);
+    const handleClick = (a: ArtistMetadata) => {
+        setChosenArtist(a);
         navigate('/setlistMetadata');
     };
 
-    // @ts-ignore
-    const { chosenArtist, setChosenArtist } = useContext(ListenerContext)
-
     return (
-        <Card >
+        <Card>
             <CardBody textAlign="left">
                 <Flex justifyContent="space-between" alignItems="center">
                     <div>
@@ -30,5 +29,5 @@ export function ArtistCard({ artist }) {
                 </Flex>
             </CardBody>
         </Card>
-    )
+    );
 }

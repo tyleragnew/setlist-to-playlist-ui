@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
 import { StepHeader } from './components/StepHeader';
 import { SetSetlistMetadata } from './pages/SetSetlistMetadata';
+import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/ListenerContext';
 
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
 
-export const ListenerContext = React.createContext(null);
+// re-use ListenerContext and associated types from src/context/ListenerContext
 
 function App() {
 
-  const [token, setToken] = useState("")
+  const [token, setToken] = useState<string>('')
 
-  const clientId: string = "d74b3ce0fbf342ecbfc8b32423800fa2";
+  const clientId = "d74b3ce0fbf342ecbfc8b32423800fa2";
   const authorizationEndpoint = "https://accounts.spotify.com/authorize";
   const tokenEndpoint = "https://accounts.spotify.com/api/token";
   const callbackURL = "https://setlist-to-playlist-ui.vercel.app/callback"
@@ -28,8 +29,8 @@ function App() {
 
     async function getAccessToken() {
       const urlParams = new URLSearchParams(window.location.search);
-      let code = urlParams.get('code');
-      let codeVerifier = localStorage.getItem('code_verifier');
+      const code = urlParams.get('code');
+      const codeVerifier = localStorage.getItem('code_verifier');
 
       const payload: RequestInit = {
         method: 'POST',
@@ -65,7 +66,7 @@ function App() {
         return text;
       }
 
-      async function generateCodeChallenge(codeVerifier: any) {
+      async function generateCodeChallenge(codeVerifier: string) {
         const digest = await crypto.subtle.digest(
           'SHA-256',
           new TextEncoder().encode(codeVerifier),
@@ -98,15 +99,14 @@ function App() {
     }
   }, []);
 
-  const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>();
-  const [playlistMetadata, setPlaylistMetadata] = useState<any>();
-  const [setlistMetadata, setSetlistMetadata] = useState<any>();
-  const [setlistLoaded, setSetlistLoaded] = useState<false>();
+  const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>(null);
+  const [playlistMetadata, setPlaylistMetadata] = useState<PlaylistMetadata | null>(null);
+  const [setlistMetadata, setSetlistMetadata] = useState<SetlistMetadata | null>(null);
+  const [setlistLoaded, setSetlistLoaded] = useState<boolean>(false);
 
   return (
     <>
       <ListenerContext.Provider
-        //@ts-ignore
         value={{
           chosenArtist,
           setChosenArtist,
@@ -116,7 +116,7 @@ function App() {
           setlistMetadata,
           setSetlistMetadata,
           setlistLoaded,
-          setSetlistLoaded
+          setSetlistLoaded,
         }}>
         <ChakraProvider>
           <StepHeader />

@@ -1,35 +1,35 @@
-import { useContext } from "react";
-import { ListenerContext } from "../App";
-import { Button, OrderedList, ListItem } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { Button, OrderedList, ListItem } from "@chakra-ui/react";
+import { useListenerContext } from "../App";
 
 export function ProjectedSetlist() {
-
-    //@ts-ignore
-    const { setlistMetadata, token, setSetlistLoaded, setPlaylistMetadata } = useContext(ListenerContext)
-
+    const { setlistMetadata, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
     const handleClick = () => {
-        fetchData()
-        navigate("/playlist")
-    }
+        void fetchData();
+        navigate("/playlist");
+    };
 
     const fetchData = async () => {
         try {
             const response = await fetch(
-                `https://setlist-to-playlist-api.vercel.app/playlists`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': `${token}`
+                `https://setlist-to-playlist-api.vercel.app/playlists`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'api-key': `${token}`,
+                    },
+                    body: JSON.stringify(setlistMetadata ?? {}),
                 },
-                body: JSON.stringify(setlistMetadata)
-            })
+            );
+
             const jsonData = await response.json();
             setPlaylistMetadata(jsonData);
-            setSetlistLoaded(true)
+            setSetlistLoaded(true);
         } catch (error) {
+            // keep error as unknown and log safely
             console.error('Error fetching data:', error);
         }
     };
@@ -37,15 +37,12 @@ export function ProjectedSetlist() {
     return (
         <>
             <OrderedList>
-                {setlistMetadata.songs.map
-                    //@ts-ignore
-                    ((song, index) => {
-                        return <ListItem key={index}>{song}</ListItem>
-                    })}
+                {(setlistMetadata?.songs ?? []).map((song, index) => (
+                    <ListItem key={index}>{song}</ListItem>
+                ))}
             </OrderedList>
             <br />
-            <Button onClick={() => handleClick()}>Generate My Playlist!</Button>
+            <Button onClick={handleClick}>Generate My Playlist!</Button>
         </>
-    )
-
+    );
 }
