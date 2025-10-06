@@ -7,7 +7,7 @@ import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/Li
 import { useAuth } from './hooks/useAuth';
 
 import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
 
 // re-use ListenerContext and associated types from src/context/ListenerContext
@@ -42,9 +42,11 @@ function App() {
           <br />
           <BrowserRouter>
             <Routes>
-              <Route index path="/callback" element={<ChooseArtist />} />
+              <Route path="/" element={<ChooseArtist />} />
+              <Route path="/callback" element={<ChooseArtist />} />
               <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
               <Route path="/playlist" element={<ReviewPlaylist />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
         </ChakraProvider>
