@@ -1,10 +1,16 @@
 import { Button, FormControl, FormHelperText, Input, Radio, RadioGroup, SimpleGrid, Stack } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
+import { useSetStep } from '../context/StepContext'
 
 export function SetSetlistMetadata() {
     const { chosenArtist, setSetlistMetadata } = useListenerContext();
+
+    const setStep = useSetStep()
+    useEffect(() => {
+        setStep(1)
+    }, [setStep])
 
     const [setlistLoaded, setSetlistLoaded] = useState(false);
 

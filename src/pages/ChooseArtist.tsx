@@ -1,6 +1,7 @@
 import { Input, SimpleGrid } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
+import { useSetStep } from '../context/StepContext'
 
 
 export type ArtistMetadata = {
@@ -11,6 +12,12 @@ export type ArtistMetadata = {
 }
 
 export function ChooseArtist() {
+
+    const setStep = useSetStep()
+    useEffect(() => {
+        setStep(0)
+    }, [setStep])
+
 
 
     const [listOfArtists, setListofArtists] = useState<ArtistMetadata[]>([]);

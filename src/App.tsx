@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChakraProvider } from '@chakra-ui/react'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
 import { StepHeader } from './components/StepHeader';
+import { StepProvider } from './context/StepContext';
 import { SetSetlistMetadata } from './pages/SetSetlistMetadata';
 import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/ListenerContext';
 import { useAuth } from './hooks/useAuth';
@@ -38,17 +39,19 @@ function App() {
           setlistLoaded,
           setSetlistLoaded,
         }}>
-        <ChakraProvider>
-          <StepHeader />
-          <br />
-          <Routes>
-            <Route path="/" element={<ChooseArtist />} />
-            <Route path="/callback" element={<Callback />} />
-            <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
-            <Route path="/playlist" element={<ReviewPlaylist />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </ChakraProvider>
+        <StepProvider>
+          <ChakraProvider>
+            <StepHeader />
+            <br />
+            <Routes>
+              <Route path="/" element={<ChooseArtist />} />
+              <Route path="/callback" element={<Callback />} />
+              <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
+              <Route path="/playlist" element={<ReviewPlaylist />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </ChakraProvider>
+        </StepProvider>
       </ListenerContext.Provider >
     </>
   )

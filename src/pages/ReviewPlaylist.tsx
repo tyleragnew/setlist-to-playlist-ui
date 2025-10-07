@@ -1,10 +1,17 @@
 import { AspectRatio, Button, SimpleGrid, Spinner } from "@chakra-ui/react";
 import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
+import { useSetStep } from '../context/StepContext'
+import { useEffect } from 'react'
 
 export function ReviewPlaylist() {
     const navigate = useNavigate();
     const { setlistLoaded, chosenArtist, playlistMetadata } = useListenerContext();
+
+    const setStep = useSetStep()
+    useEffect(() => {
+        setStep(2)
+    }, [setStep])
 
     return (
         <>
