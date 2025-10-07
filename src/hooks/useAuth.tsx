@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
+const authorizationEndpoint = 'https://accounts.spotify.com/authorize';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
 const callbackURL = 'https://setlist-to-playlist-ui.vercel.app/callback';
 
@@ -47,8 +48,48 @@ export function useAuth() {
         const code = urlParams.get('code');
         if (code && !token) {
             void exchangeCodeForToken(code);
+            return;
         }
-        // else if no code and no token, PKCE flow will be started by app if needed
+
+        // If no code and no token and no verifier, start PKCE flow (redirect to Spotify)
+        if (!code && !token && !localStorage.getItem('code_verifier')) {
+            // don't run redirects during unit tests
+            // @ts-ignore - vitest sets import.meta.vitest
+            if (typeof import.meta !== 'undefined' && (import.meta as any).vitest) return;
+
+            (async function startPKCE() {
+                function generateRandomString(length: number) {
+                    let text = '';
+                    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    for (let i = 0; i < length; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                }
+
+                async function generateCodeChallenge(codeVerifier: string) {
+                    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
+                    return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                }
+
+                const hashed = generateRandomString(64);
+                const codeChallenge = await generateCodeChallenge(hashed);
+                localStorage.setItem('code_verifier', hashed);
+
+                const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private';
+                const authUrl = new URL(authorizationEndpoint);
+                const params = {
+                    response_type: 'code',
+                    client_id: clientId,
+                    scope,
+                    code_challenge_method: 'S256',
+                    code_challenge: codeChallenge,
+                    redirect_uri: callbackURL,
+                } as Record<string, string>;
+                authUrl.search = new URLSearchParams(params).toString();
+                window.location.href = authUrl.toString();
+            })();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
