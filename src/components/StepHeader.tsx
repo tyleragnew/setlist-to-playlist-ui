@@ -1,4 +1,4 @@
-import { Box, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Button, HStack } from "@chakra-ui/react"
+import { Box, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Button, Stack } from "@chakra-ui/react"
 import { useNavigate } from 'react-router-dom'
 import { useStep, useSetStep } from '../context/StepContext'
 
@@ -26,28 +26,39 @@ export function StepHeader() {
 
     return (
         <>
-            <Stepper index={activeStep}>
-                {steps.map((step, index) => (
-                    <Step key={index}>
-                        <StepIndicator>
-                            <StepStatus
-                                complete={<StepIcon />}
-                                incomplete={<StepNumber />}
-                                active={<StepNumber />}
-                            />
-                        </StepIndicator>
-                        <Box flexShrink='0'>
-                            <StepTitle>{step.title}</StepTitle>
-                            <StepDescription>{step.description}</StepDescription>
-                        </Box>
-                        <StepSeparator />
-                    </Step>
-                ))}
-            </Stepper>
-            <HStack spacing={4} mt={4}>
-                <Button onClick={onPrev} isDisabled={activeStep <= 0}>Previous</Button>
-                <Button onClick={onNext} colorScheme='blue' isDisabled={activeStep >= steps.length - 1}>Next</Button>
-            </HStack>
+            {/* allow horizontal scroll on small screens so the stepper won't get squished */}
+            <Box overflowX={{ base: 'auto', md: 'visible' }} px={{ base: 4, md: 0 }}>
+                <Stepper index={activeStep}>
+                    {steps.map((step, index) => (
+                        <Step key={index}>
+                            <StepIndicator>
+                                <StepStatus
+                                    complete={<StepIcon />}
+                                    incomplete={<StepNumber />}
+                                    active={<StepNumber />}
+                                />
+                            </StepIndicator>
+                            <Box flexShrink='0' minW={{ base: '160px', md: 'auto' }}>
+                                <Box as={StepTitle} fontSize={{ base: 'sm', md: 'md' }}>{step.title}</Box>
+                                <Box as={StepDescription} display={{ base: 'none', md: 'block' }}>{step.description}</Box>
+                            </Box>
+                            <StepSeparator />
+                        </Step>
+                    ))}
+                </Stepper>
+            </Box>
+
+            {/* fixed bottom controls: stack vertically on mobile, horizontally on larger screens */}
+            <Box position="fixed" bottom={{ base: '8px', md: '16px' }} left={0} right={0} display="flex" justifyContent="center" zIndex={20} px={{ base: 4, md: 0 }}>
+                <Stack direction={{ base: 'column', md: 'row' }} spacing={3} align="center" maxW="720px" width="100%">
+                    <Button onClick={onPrev} isDisabled={activeStep <= 0} size={{ base: 'sm', md: 'md' }} w={{ base: '100%', md: 'auto' }}>
+                        Previous
+                    </Button>
+                    <Button onClick={onNext} colorScheme='blue' isDisabled={activeStep >= steps.length - 1} size={{ base: 'sm', md: 'md' }} w={{ base: '100%', md: 'auto' }}>
+                        Next
+                    </Button>
+                </Stack>
+            </Box>
         </>
     )
 }
