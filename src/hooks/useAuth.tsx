@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
 const authorizationEndpoint = 'https://accounts.spotify.com/authorize';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
-const callbackURL = 'https://setlist-to-playlist-ui.vercel.app/callback';
+// Resolve redirect URI from env (Vite) or fallback to current origin + /callback
+const defaultRedirect = typeof window !== 'undefined' ? `${window.location.origin}/callback` : 'https://setlist-to-playlist-ui.vercel.app/callback';
+const callbackURL = (import.meta as any).env?.VITE_SPOTIFY_REDIRECT_URI ?? defaultRedirect;
 
 type TokenResponse = {
     access_token?: string;
@@ -46,13 +48,14 @@ export function useAuth() {
         // If there's no token, but a code param exists, exchange it.
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        console.debug('[useAuth] token:', Boolean(token), 'code present:', Boolean(code), 'callbackURL:', callbackURL);
         if (code && !token) {
             void exchangeCodeForToken(code);
             return;
         }
 
-        // If no code and no token and no verifier, start PKCE flow (redirect to Spotify)
-        if (!code && !token && !localStorage.getItem('code_verifier')) {
+        // If no code and no token, start PKCE flow (redirect to Spotify)
+        if (!code && !token) {
             // don't run redirects during unit tests
             // @ts-ignore - vitest sets import.meta.vitest
             if (typeof import.meta !== 'undefined' && (import.meta as any).vitest) return;
@@ -87,6 +90,7 @@ export function useAuth() {
                     redirect_uri: callbackURL,
                 } as Record<string, string>;
                 authUrl.search = new URLSearchParams(params).toString();
+                console.debug('[useAuth] redirecting to Spotify auth URL', authUrl.toString());
                 window.location.href = authUrl.toString();
             })();
         }

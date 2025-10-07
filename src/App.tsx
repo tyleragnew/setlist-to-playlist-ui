@@ -7,8 +7,9 @@ import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/Li
 import { useAuth } from './hooks/useAuth';
 
 import './App.css'
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
+import { Callback } from './pages/Callback';
 
 // re-use ListenerContext and associated types from src/context/ListenerContext
 
@@ -40,15 +41,13 @@ function App() {
         <ChakraProvider>
           <StepHeader />
           <br />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<ChooseArtist />} />
-              <Route path="/callback" element={<ChooseArtist />} />
-              <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
-              <Route path="/playlist" element={<ReviewPlaylist />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
+          <Routes>
+            <Route path="/" element={<ChooseArtist />} />
+            <Route path="/callback" element={<Callback />} />
+            <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
+            <Route path="/playlist" element={<ReviewPlaylist />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </ChakraProvider>
       </ListenerContext.Provider >
     </>
