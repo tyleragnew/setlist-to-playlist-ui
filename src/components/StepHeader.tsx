@@ -1,4 +1,4 @@
-import { Box, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Button, Stack } from "@chakra-ui/react"
+import { Box, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper, Button, Stack, HStack, Circle, Text } from "@chakra-ui/react"
 import { useNavigate } from 'react-router-dom'
 import { useStep, useSetStep } from '../context/StepContext'
 
@@ -26,8 +26,19 @@ export function StepHeader() {
 
     return (
         <>
-            {/* allow horizontal scroll on small screens so the stepper won't get squished */}
-            <Box overflowX={{ base: 'auto', md: 'visible' }} px={{ base: 4, md: 0 }}>
+            {/* mobile: compact, non-scrolling header */}
+            <Box px={4} py={3} display={{ base: 'block', md: 'none' }}>
+                <Text fontSize='sm' color='gray.500'>{`Step ${activeStep + 1} of ${steps.length}`}</Text>
+                <Text fontSize='lg' fontWeight='semibold'>{steps[activeStep].title}</Text>
+                <HStack spacing={2} mt={2}>
+                    {steps.map((_, i) => (
+                        <Circle key={i} size='8px' bg={i === activeStep ? 'blue.500' : 'gray.300'} />
+                    ))}
+                </HStack>
+            </Box>
+
+            {/* desktop: full stepper */}
+            <Box px={{ base: 0, md: 0 }} display={{ base: 'none', md: 'block' }}>
                 <Stepper index={activeStep}>
                     {steps.map((step, index) => (
                         <Step key={index}>
@@ -38,9 +49,9 @@ export function StepHeader() {
                                     active={<StepNumber />}
                                 />
                             </StepIndicator>
-                            <Box flexShrink='0' minW={{ base: '160px', md: 'auto' }}>
-                                <Box as={StepTitle} fontSize={{ base: 'sm', md: 'md' }}>{step.title}</Box>
-                                <Box as={StepDescription} display={{ base: 'none', md: 'block' }}>{step.description}</Box>
+                            <Box flexShrink='0'>
+                                <Box as={StepTitle}>{step.title}</Box>
+                                <Box as={StepDescription}>{step.description}</Box>
                             </Box>
                             <StepSeparator />
                         </Step>
