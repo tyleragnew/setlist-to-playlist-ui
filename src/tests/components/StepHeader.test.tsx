@@ -15,11 +15,11 @@ test('renders step titles', () => {
         </MemoryRouter>
     )
     // Titles may appear in both mobile and desktop variants; ensure they appear at least once
-    expect(screen.getAllByText('First').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('Second').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('Third').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Artist').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Setlist').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Playlist').length).toBeGreaterThanOrEqual(1)
 
     // Mobile compact view should display the active step title as well
-    const mobileTitle = screen.getAllByText('First')[0]
+    const mobileTitle = screen.getAllByText('Artist')[0]
     expect(mobileTitle).toBeInTheDocument()
 })
