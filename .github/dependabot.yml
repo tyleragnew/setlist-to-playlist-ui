@@ -9,9 +9,21 @@ updates:
     schedule:
       interval: "daily"
 
+    groups:
+      gh-all:
+        patterns:
+          - "*"
+        dependency-type: "all"
+
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 10 
+    open-pull-requests-limit: 10
+
+    groups:
+      npm-all:
+        patterns:
+          - "*"
+        dependency-type: "all"
