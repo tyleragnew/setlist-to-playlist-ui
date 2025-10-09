@@ -24,6 +24,45 @@ export function useAuth() {
 
     const refreshTimer = useRef<number | null>(null);
 
+    const isVitest = typeof import.meta !== 'undefined' && (import.meta as any).vitest;
+
+    async function startPKCE() {
+        // don't run redirects during unit tests
+        if (isVitest) return;
+
+        function generateRandomString(length: number) {
+            let text = '';
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            for (let i = 0; i < length; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
+        }
+
+        async function generateCodeChallenge(codeVerifier: string) {
+            const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
+            return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+        }
+
+        const hashed = generateRandomString(64);
+        const codeChallenge = await generateCodeChallenge(hashed);
+        localStorage.setItem('code_verifier', hashed);
+
+        const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private';
+        const authUrl = new URL(authorizationEndpoint);
+        const params = {
+            response_type: 'code',
+            client_id: clientId,
+            scope,
+            code_challenge_method: 'S256',
+            code_challenge: codeChallenge,
+            redirect_uri: callbackURL,
+        } as Record<string, string>;
+        authUrl.search = new URLSearchParams(params).toString();
+        console.debug('[useAuth] redirecting to Spotify auth URL', authUrl.toString());
+        window.location.href = authUrl.toString();
+    }
+
     useEffect(() => {
         if (token && expiry) {
             const now = Date.now();
@@ -54,48 +93,22 @@ export function useAuth() {
             return;
         }
 
-        // If no code and no token, start PKCE flow (redirect to Spotify)
+        // If no code and no token on initial mount, start PKCE flow (redirect to Spotify)
         if (!code && !token) {
-            // don't run redirects during unit tests
-            // @ts-ignore - vitest sets import.meta.vitest
-            if (typeof import.meta !== 'undefined' && (import.meta as any).vitest) return;
-
-            (async function startPKCE() {
-                function generateRandomString(length: number) {
-                    let text = '';
-                    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                    for (let i = 0; i < length; i++) {
-                        text += possible.charAt(Math.floor(Math.random() * possible.length));
-                    }
-                    return text;
-                }
-
-                async function generateCodeChallenge(codeVerifier: string) {
-                    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier));
-                    return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-                }
-
-                const hashed = generateRandomString(64);
-                const codeChallenge = await generateCodeChallenge(hashed);
-                localStorage.setItem('code_verifier', hashed);
-
-                const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private';
-                const authUrl = new URL(authorizationEndpoint);
-                const params = {
-                    response_type: 'code',
-                    client_id: clientId,
-                    scope,
-                    code_challenge_method: 'S256',
-                    code_challenge: codeChallenge,
-                    redirect_uri: callbackURL,
-                } as Record<string, string>;
-                authUrl.search = new URLSearchParams(params).toString();
-                console.debug('[useAuth] redirecting to Spotify auth URL', authUrl.toString());
-                window.location.href = authUrl.toString();
-            })();
+            void startPKCE();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Watch token and always redirect to Spotify auth flow whenever the token becomes falsy.
+    useEffect(() => {
+        if (token) return;
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (!code) {
+            void startPKCE();
+        }
+    }, [token]);
 
     async function exchangeCodeForToken(code: string) {
         const codeVerifier = localStorage.getItem('code_verifier') ?? '';
