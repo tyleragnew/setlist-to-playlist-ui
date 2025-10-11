@@ -1,4 +1,4 @@
-import { Button, FormControl, Input, Radio, RadioGroup, Stack, Box, Text, Image, Spinner } from "@chakra-ui/react";
+import { Button, FormControl, Radio, RadioGroup, Stack, Box, Text } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
@@ -10,30 +10,15 @@ export function SetSetlistMetadata() {
     useEffect(() => { setStep(1); }, [setStep]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
 
-    // Artist image state
-    const [artistImage, setArtistImage] = useState<string | null>(null);
-    const [imageLoading, setImageLoading] = useState(false);
-
-    // Fetch artist image from Last.fm
-    useEffect(() => {
-        if (!chosenArtist?.artistName) return;
-        setImageLoading(true);
-        fetch(`https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${encodeURIComponent(chosenArtist.artistName)}&api_key=2bcb9d7b2b6b4b7e8e7e8e7e8e7e8e7e&format=json`)
-            .then(res => res.json())
-            .then(data => {
-                const img = data?.artist?.image?.find((img: any) => img.size === 'extralarge')?.['#text'] || null;
-                setArtistImage(img);
-            })
-            .catch(() => setArtistImage(null))
-            .finally(() => setImageLoading(false));
-    }, [chosenArtist]);
+    // Number of sets slider state
+    const [numberOfSets, setNumberOfSets] = useState(10);
 
     // @TODO - add debouncing here instead of using OnBlur event.
     const fetchData = async () => {
         if (!chosenArtist) return;
         try {
             const response = await fetch(
-                `https://setlist-to-playlist-api.vercel.app/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=20`
+                `https://setlist-to-playlist-api.vercel.app/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=${numberOfSets}`
             );
             const jsonData = await response.json();
             setSetlistMetadata(jsonData);
@@ -53,24 +38,7 @@ export function SetSetlistMetadata() {
                 p={{ base: 4, md: 8 }}
                 style={{ backdropFilter: 'blur(12px)' }}
             >
-                {/* Artist image */}
-                <Box display='flex' justifyContent='center' alignItems='center' mb={2}>
-                    {imageLoading ? (
-                        <Spinner size='lg' color='spotify.green' />
-                    ) : artistImage ? (
-                        <Image
-                            src={artistImage}
-                            alt={chosenArtist?.artistName}
-                            boxSize={{ base: '80px', md: '120px' }}
-                            borderRadius='full'
-                            objectFit='cover'
-                            boxShadow='md'
-                            border='3px solid'
-                            borderColor='spotify.green'
-                            bg='spotify.black'
-                        />
-                    ) : null}
-                </Box>
+                {/* Artist image removed */}
                 <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='spotify.white' textAlign='center' mb={2}>
                     {chosenArtist?.artistName ?? 'Selected Artist'}
                 </Text>
@@ -78,7 +46,28 @@ export function SetSetlistMetadata() {
                     Include the last X sets for {chosenArtist?.artistName ?? 'the artist'}
                 </Text>
                 <FormControl mb={2}>
-                    <Input type='number' placeholder='Number of sets...' size='lg' bg='spotify.gray' color='spotify.white' border='none' borderRadius='lg' _placeholder={{ color: 'gray.400' }} mb={3} />
+                    <Text fontSize='md' color='spotify.white' mb={2} textAlign='center'>
+                        Number of sets: <b>{numberOfSets}</b>
+                    </Text>
+                    <Box px={2} mb={3}>
+                        {/* Slider for 5, 10, 20 */}
+                        <Box position='relative'>
+                            <input
+                                type='range'
+                                min={0}
+                                max={2}
+                                step={1}
+                                value={[5, 10, 20].indexOf(numberOfSets)}
+                                onChange={e => setNumberOfSets([5, 10, 20][parseInt(e.target.value)])}
+                                style={{ width: '100%' }}
+                            />
+                            <Box display='flex' justifyContent='space-between' mt={1} px={1}>
+                                <Text fontSize='sm' color='spotify.green'>5</Text>
+                                <Text fontSize='sm' color='spotify.green'>10</Text>
+                                <Text fontSize='sm' color='spotify.green'>20</Text>
+                            </Box>
+                        </Box>
+                    </Box>
                     <RadioGroup defaultValue='1'>
                         <Stack spacing={4} direction={{ base: 'column', md: 'row' }} align='center' justify='center'>
                             <Radio value='1' colorScheme='spotify'>Include Songs on Tape</Radio>
