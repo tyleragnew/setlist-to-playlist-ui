@@ -17,16 +17,47 @@ export function ArtistCard({ artist }: ArtistCardProps) {
     };
 
     return (
-        <Card>
-            <CardBody textAlign="left">
-                <Flex justifyContent="space-between" alignItems="center">
-                    <div>
-                        <Text size='lg' fontWeight='bold'>{artist.artistName}</Text>
-                        <Text size='lg' fontStyle='italic'>{artist.location}</Text>
-                        <Text>{artist.description}</Text>
-                    </div>
-                    <Button onClick={() => handleClick(artist)}>Select</Button>
+        <Card width='100%' minHeight='120px' p={0}>
+            <CardBody
+                textAlign="left"
+                display='flex'
+                flexDirection='column'
+                justifyContent='flex-start'
+                height='100%'
+                p={4}
+            >
+                <Flex direction='row' alignItems='center' mb={1} gap={3}>
+                    {artist.imageUrl && (
+                        <img
+                            src={artist.imageUrl}
+                            alt={artist.artistName}
+                            style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                marginRight: 12,
+                            }}
+                        />
+                    )}
+                    <Text size='lg' fontWeight='bold' flex='1'>{artist.artistName}</Text>
+                    <Button
+                        onClick={() => handleClick(artist)}
+                        size='md'
+                        colorScheme='spotify'
+                        fontWeight='bold'
+                        px={6}
+                        py={2}
+                        borderRadius='full'
+                        boxShadow='md'
+                        fontSize='lg'
+                        alignSelf='center'
+                    >
+                        Select
+                    </Button>
                 </Flex>
+                <Text size='lg' fontStyle='italic' mb={0.5}>{artist.location}</Text>
+                <Text noOfLines={2} mb={0}>{artist.description}</Text>
             </CardBody>
         </Card>
     );

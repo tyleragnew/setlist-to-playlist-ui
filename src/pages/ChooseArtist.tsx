@@ -1,4 +1,4 @@
-import { Input, SimpleGrid } from "@chakra-ui/react";
+import { Input, Stack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 import { useSetStep } from '../context/StepContext'
@@ -9,6 +9,7 @@ export type ArtistMetadata = {
     description: string
     mbid: string
     location: string
+    imageUrl?: string
 }
 
 export function ChooseArtist() {
@@ -59,7 +60,7 @@ export function ChooseArtist() {
             />
             <br />
             <br />
-            <SimpleGrid columns={3} spacing='5'>
+            <Stack spacing={5} width="100%">
                 {listOfArtists.length > 0 ? (
                     listOfArtists.map((i, index) => (
                         <ArtistCard key={index} artist={i} />
@@ -67,7 +68,7 @@ export function ChooseArtist() {
                 ) : (
                     <p>No data available.</p>
                 )}
-            </SimpleGrid>
+            </Stack>
         </>
     );
 }

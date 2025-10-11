@@ -14,17 +14,17 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                 justifyContent='center'
                 alignItems='center'
                 w='100%'
-                pt={4}
-                pb={2}
-                mb={4}
+                pt={2}
+                pb={1}
+                mb={2}
             >
                 <Box
                     display='flex'
-                    flexDirection='column'
+                    flexDirection='row'
                     alignItems='center'
                     bg='rgba(40,40,40,0.85)'
                     px={3}
-                    py={2}
+                    py={1}
                     borderRadius='lg'
                     boxShadow='0 2px 12px rgba(30,185,84,0.18)'
                     border='2px solid'
@@ -32,16 +32,16 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                 >
                     {image && (
                         <Box
-                            boxSize='48px'
+                            boxSize='40px'
                             borderRadius='full'
                             overflow='hidden'
                             border='3px solid'
                             borderColor='spotify.green'
-                            mb={2}
                             bg='spotify.black'
                             display='flex'
                             alignItems='center'
                             justifyContent='center'
+                            mr={3}
                         >
                             <img
                                 src={image}
@@ -50,12 +50,14 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                             />
                         </Box>
                     )}
-                    <Text fontWeight='bold' fontSize='md' color='spotify.green' mb={1} fontFamily='heading'>
-                        {displayName}
-                    </Text>
-                    <Text fontSize='xs' color='spotify.white' opacity={0.8} fontStyle='italic' letterSpacing='wider'>
-                        Logged in
-                    </Text>
+                    <Box display='flex' flexDirection='column' alignItems='flex-start'>
+                        <Text fontWeight='bold' fontSize='md' color='spotify.green' mb={0} fontFamily='heading'>
+                            {displayName}
+                        </Text>
+                        <Text fontSize='xs' color='spotify.white' opacity={0.8} fontStyle='italic' letterSpacing='wider' mb={0}>
+                            Logged in
+                        </Text>
+                    </Box>
                 </Box>
             </Box>
             {/* Desktop: fixed top right */}
