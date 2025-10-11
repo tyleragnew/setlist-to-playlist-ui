@@ -41,7 +41,7 @@ export function ReviewPlaylist() {
                         </div>
                     )}
                     <br />
-                    <Button onClick={() => navigate('/callback')}>Create Another</Button>
+                    <Button onClick={() => navigate('/')}>Create Another</Button>
                 </SimpleGrid>
             ) : (
                 <Spinner size='xl' />

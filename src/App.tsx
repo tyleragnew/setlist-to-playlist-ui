@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Box } from '@chakra-ui/react'
+import { SpotifyProfile } from './components/SpotifyProfile';
+import theme from './theme'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
 import { StepHeader } from './components/StepHeader';
 import { StepProvider } from './context/StepContext';
@@ -15,10 +17,7 @@ import { Callback } from './pages/Callback';
 // re-use ListenerContext and associated types from src/context/ListenerContext
 
 function App() {
-
-  const { token } = useAuth();
-
-  // Authentication handled by useAuth hook
+  const { token, profile } = useAuth();
 
   const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>(null);
   const [playlistMetadata, setPlaylistMetadata] = useState<PlaylistMetadata | null>(null);
@@ -40,22 +39,32 @@ function App() {
           setSetlistLoaded,
         }}>
         <StepProvider>
-          <ChakraProvider>
-            <StepHeader />
-            <br />
-            <Routes>
-              <Route path="/" element={<ChooseArtist />} />
-              <Route path="/callback" element={<Callback />} />
-              <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
-              <Route path="/playlist" element={<ReviewPlaylist />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+          <ChakraProvider theme={theme}>
+            {/* Responsive Spotify profile section */}
+            {token && profile && (
+              <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
+            )}
+            <Box bg='spotify.black' minH='100vh' display='flex' flexDirection='column'>
+              {/* Add top margin to header on desktop to avoid overlap with fixed profile */}
+              <Box mt={{ base: 0, md: 20 }}>
+                <StepHeader />
+              </Box>
+              <Box flex='1' display='flex' flexDirection='column' justifyContent='flex-start' pb={{ base: 20, md: 16 }}>
+                <Routes>
+                  <Route path="/" element={<ChooseArtist />} />
+                  <Route path="/callback" element={<Callback />} />
+                  <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
+                  <Route path="/playlist" element={<ReviewPlaylist />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Box>
+            </Box>
           </ChakraProvider>
         </StepProvider>
       </ListenerContext.Provider >
     </>
-  )
-
+  );
+  // ...existing code...
 }
 
 export default App

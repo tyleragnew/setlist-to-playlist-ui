@@ -22,9 +22,35 @@ export function useAuth() {
         return v ? Number(v) : null;
     });
 
+    // Spotify profile state
+    const [profile, setProfile] = useState<{ displayName: string; image: string | null } | null>(null);
+
     const refreshTimer = useRef<number | null>(null);
 
     const isVitest = typeof import.meta !== 'undefined' && (import.meta as any).vitest;
+
+    // Fetch Spotify profile when token is available
+    useEffect(() => {
+        if (!token) {
+            setProfile(null);
+            return;
+        }
+        (async () => {
+            try {
+                const res = await fetch('https://api.spotify.com/v1/me', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error('Failed to fetch Spotify profile');
+                const json = await res.json();
+                setProfile({
+                    displayName: json.display_name ?? json.id ?? 'Spotify User',
+                    image: Array.isArray(json.images) && json.images.length > 0 ? json.images[0].url : null,
+                });
+            } catch (err) {
+                setProfile(null);
+            }
+        })();
+    }, [token]);
 
     async function startPKCE() {
         // don't run redirects during unit tests
@@ -195,6 +221,7 @@ export function useAuth() {
         refreshToken,
         expiry,
         isAuthenticated: Boolean(token),
+        profile,
         exchangeCodeForToken,
         refreshAccessToken,
         clearAuth,
