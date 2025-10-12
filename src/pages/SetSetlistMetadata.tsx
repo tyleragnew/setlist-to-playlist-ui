@@ -30,10 +30,12 @@ export function SetSetlistMetadata() {
 
     // Fetched image URL for the chosen artist
     const [artistImage, setArtistImage] = useState<string>("");
+    const [imageLoading, setImageLoading] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchArtistImage() {
             if (!chosenArtist?.artistName) return setArtistImage("");
+            setImageLoading(true);
             try {
                 const response = await fetch(
                     `https://setlist-to-playlist-api.vercel.app/artists/image?artist=${encodeURIComponent(chosenArtist.artistName)}`,
@@ -44,14 +46,16 @@ export function SetSetlistMetadata() {
                         },
                     }
                 );
-                const data = await response.json();
-                setArtistImage(data?.imageUrl || "");
+                const imageUrl = await response.text();
+                setArtistImage(typeof imageUrl === 'string' ? imageUrl : "");
             } catch (error) {
                 setArtistImage("");
+            } finally {
+                setImageLoading(false);
             }
         }
         fetchArtistImage();
-    }, [chosenArtist]);
+    }, [chosenArtist, token]);
 
     return (
         <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' px={{ base: 2, md: 0 }} pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
@@ -66,15 +70,24 @@ export function SetSetlistMetadata() {
                 {/* Artist image and name in a row */}
                 {chosenArtist?.artistName && (
                     <Box display="flex" flexDirection="row" alignItems="center" mb={2} justifyContent="center">
-                        <Image
-                            src={artistImage || "https://via.placeholder.com/64?text=Artist"}
-                            alt={chosenArtist.artistName}
-                            boxSize="48px"
-                            borderRadius="full"
-                            border="2px solid #1DB954"
-                            objectFit="cover"
-                            mr={4}
-                        />
+                        {imageLoading || !artistImage ? (
+                            <Box boxSize="80px" display="flex" alignItems="center" justifyContent="center" mr={4}>
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="20" cy="20" r="18" stroke="#1DB954" strokeWidth="4" opacity="0.2" />
+                                    <path d="M20 4a16 16 0 1 1-16 16" stroke="#1DB954" strokeWidth="4" strokeLinecap="round" />
+                                </svg>
+                            </Box>
+                        ) : (
+                            <Image
+                                src={artistImage}
+                                alt={chosenArtist.artistName}
+                                boxSize="80px"
+                                borderRadius="full"
+                                border="2px solid #1DB954"
+                                objectFit="cover"
+                                mr={4}
+                            />
+                        )}
                         <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='spotify.white' textAlign='left'>
                             {chosenArtist.artistName}
                         </Text>
