@@ -1,11 +1,11 @@
-import { Button, FormControl, Radio, RadioGroup, Stack, Box, Text } from "@chakra-ui/react";
+import { Button, FormControl, Radio, RadioGroup, Stack, Box, Text, Image } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
 import { useSetStep } from '../context/StepContext'
 
 export function SetSetlistMetadata() {
-    const { chosenArtist, setSetlistMetadata } = useListenerContext();
+    const { chosenArtist, setSetlistMetadata, token } = useListenerContext();
     const setStep = useSetStep();
     useEffect(() => { setStep(1); }, [setStep]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
@@ -28,6 +28,31 @@ export function SetSetlistMetadata() {
         }
     };
 
+    // Fetched image URL for the chosen artist
+    const [artistImage, setArtistImage] = useState<string>("");
+
+    useEffect(() => {
+        async function fetchArtistImage() {
+            if (!chosenArtist?.artistName) return setArtistImage("");
+            try {
+                const response = await fetch(
+                    `https://setlist-to-playlist-api.vercel.app/artists/image?artist=${encodeURIComponent(chosenArtist.artistName)}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'api-key': `${token}`,
+                        },
+                    }
+                );
+                const data = await response.json();
+                setArtistImage(data?.imageUrl || "");
+            } catch (error) {
+                setArtistImage("");
+            }
+        }
+        fetchArtistImage();
+    }, [chosenArtist]);
+
     return (
         <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' px={{ base: 2, md: 0 }} pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
             <Box
@@ -38,10 +63,23 @@ export function SetSetlistMetadata() {
                 p={{ base: 4, md: 8 }}
                 style={{ backdropFilter: 'blur(12px)' }}
             >
-                {/* Artist image removed */}
-                <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='spotify.white' textAlign='center' mb={2}>
-                    {chosenArtist?.artistName ?? 'Selected Artist'}
-                </Text>
+                {/* Artist image and name in a row */}
+                {chosenArtist?.artistName && (
+                    <Box display="flex" flexDirection="row" alignItems="center" mb={2} justifyContent="center">
+                        <Image
+                            src={artistImage || "https://via.placeholder.com/64?text=Artist"}
+                            alt={chosenArtist.artistName}
+                            boxSize="48px"
+                            borderRadius="full"
+                            border="2px solid #1DB954"
+                            objectFit="cover"
+                            mr={4}
+                        />
+                        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='spotify.white' textAlign='left'>
+                            {chosenArtist.artistName}
+                        </Text>
+                    </Box>
+                )}
                 <Text fontSize='md' color='spotify.green' textAlign='center' mb={4}>
                     Include the last X sets for {chosenArtist?.artistName ?? 'the artist'}
                 </Text>
