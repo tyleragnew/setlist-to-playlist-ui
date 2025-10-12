@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChakraProvider, Box } from '@chakra-ui/react'
 import { SpotifyProfile } from './components/SpotifyProfile';
 import theme from './theme'
@@ -10,19 +10,25 @@ import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/Li
 import { useAuth } from './hooks/useAuth';
 
 import './App.css'
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
 import { Callback } from './pages/Callback';
 
 // re-use ListenerContext and associated types from src/context/ListenerContext
 
 function App() {
+  const location = useLocation();
   const { token, profile } = useAuth();
 
   const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>(null);
   const [playlistMetadata, setPlaylistMetadata] = useState<PlaylistMetadata | null>(null);
   const [setlistMetadata, setSetlistMetadata] = useState<SetlistMetadata | null>(null);
   const [setlistLoaded, setSetlistLoaded] = useState<boolean>(false);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location]);
 
   return (
     <>

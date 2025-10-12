@@ -14,7 +14,7 @@ export function Callback() {
             return;
         }
 
-        void (async () => {
+        (async () => {
             try {
                 const codeVerifier = localStorage.getItem('code_verifier') ?? '';
                 const payload = new URLSearchParams({
@@ -45,7 +45,10 @@ export function Callback() {
                 const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
                 window.history.replaceState({}, '', newUrl);
 
-                window.location.replace('/');
+                // Wait for React to update state before redirecting
+                setTimeout(() => {
+                    window.location.replace('/');
+                }, 50);
             } catch (err) {
                 console.error('Error exchanging code in callback page', err);
                 setMessage('Sign-in failed. Check console for details.');

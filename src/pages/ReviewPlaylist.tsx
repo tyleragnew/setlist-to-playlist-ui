@@ -44,7 +44,9 @@ export function ReviewPlaylist() {
                     <Button onClick={() => navigate('/')}>Create Another</Button>
                 </SimpleGrid>
             ) : (
-                <Spinner size='xl' />
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '352px', maxWidth: '800px', margin: '0 auto' }}>
+                    <Spinner thickness="6px" speed="0.8s" emptyColor="gray.200" color="spotify.green" size="xl" width="100%" height="352px" />
+                </div>
             )}
         </>
     );
