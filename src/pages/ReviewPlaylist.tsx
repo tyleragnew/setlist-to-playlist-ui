@@ -1,4 +1,5 @@
 import { AspectRatio, Button, SimpleGrid, Spinner } from "@chakra-ui/react";
+import { ThemedHeader } from "../components/ThemedHeader";
 import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
 import { useSetStep } from '../context/StepContext'
@@ -17,7 +18,10 @@ export function ReviewPlaylist() {
         <>
             {setlistLoaded ? (
                 <SimpleGrid alignItems='center'>
-                    <h1>Here's your setlist for {chosenArtist?.artistName ?? 'the artist'}</h1>
+                    <br />
+                    <ThemedHeader>
+                        Here's your setlist for {chosenArtist?.artistName ?? 'the artist'}
+                    </ThemedHeader>
                     <AspectRatio alignItems='center' maxW='800px' ratio={1}>
                         <iframe
                             src={(playlistMetadata?.embedURL ?? '').toString()}

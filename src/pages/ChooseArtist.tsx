@@ -1,4 +1,6 @@
 import { Input, Stack } from "@chakra-ui/react";
+import { ThemedHeader } from "../components/ThemedHeader";
+
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 import { useSetStep } from '../context/StepContext'
@@ -50,7 +52,8 @@ export function ChooseArtist() {
 
     return (
         <>
-            <h1>Choose Your Artist...</h1>
+            <br />
+            <ThemedHeader>Choose Your Artist...</ThemedHeader>
             <br />
             <Input
                 value={artistInput}
