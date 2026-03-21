@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { ArtistMetadata } from "../pages/ChooseArtist";
 import { useListenerContext } from "../context/ListenerContext";
@@ -17,48 +17,65 @@ export function ArtistCard({ artist }: ArtistCardProps) {
     };
 
     return (
-        <Card width='100%' minHeight='120px' p={0}>
-            <CardBody
-                textAlign="left"
-                display='flex'
-                flexDirection='column'
-                justifyContent='flex-start'
-                height='100%'
-                p={4}
+        <Box
+            w='100%'
+            bg='bg.card'
+            border='1px solid'
+            borderColor='border.subtle'
+            borderRadius='xl'
+            p={4}
+            display='flex'
+            flexDirection='row'
+            alignItems='center'
+            gap={4}
+            transition='all 0.2s ease'
+            _hover={{
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                borderColor: 'accent.green',
+            }}
+            cursor='pointer'
+        >
+            {artist.imageUrl && (
+                <Box
+                    boxSize='56px'
+                    borderRadius='full'
+                    overflow='hidden'
+                    flexShrink={0}
+                    border='2px solid'
+                    borderColor='border.subtle'
+                    transition='border-color 0.2s ease'
+                    _groupHover={{ borderColor: 'accent.green' }}
+                >
+                    <img
+                        src={artist.imageUrl}
+                        alt={artist.artistName}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                </Box>
+            )}
+            <Box flex='1' minW={0}>
+                <Text fontWeight='bold' fontSize='lg' color='text.primary' noOfLines={1}>
+                    {artist.artistName}
+                </Text>
+                <Text fontSize='sm' color='text.muted' fontStyle='italic' mb={0.5} noOfLines={1}>
+                    {artist.location}
+                </Text>
+                <Text fontSize='sm' color='text.muted' noOfLines={2}>
+                    {artist.description}
+                </Text>
+            </Box>
+            <Button
+                onClick={() => handleClick(artist)}
+                size='sm'
+                colorScheme='spotify'
+                fontWeight='bold'
+                px={5}
+                borderRadius='full'
+                flexShrink={0}
             >
-                <Flex direction='row' alignItems='center' mb={1} gap={3}>
-                    {artist.imageUrl && (
-                        <img
-                            src={artist.imageUrl}
-                            alt={artist.artistName}
-                            style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                marginRight: 12,
-                            }}
-                        />
-                    )}
-                    <Text size='lg' fontWeight='bold' flex='1'>{artist.artistName}</Text>
-                    <Button
-                        onClick={() => handleClick(artist)}
-                        size='md'
-                        colorScheme='spotify'
-                        fontWeight='bold'
-                        px={6}
-                        py={2}
-                        borderRadius='full'
-                        boxShadow='md'
-                        fontSize='lg'
-                        alignSelf='center'
-                    >
-                        Select
-                    </Button>
-                </Flex>
-                <Text size='lg' fontStyle='italic' mb={0.5}>{artist.location}</Text>
-                <Text noOfLines={2} mb={0}>{artist.description}</Text>
-            </CardBody>
-        </Card>
+                Select
+            </Button>
+        </Box>
     );
 }

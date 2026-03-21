@@ -1,10 +1,8 @@
-import { Input, Stack } from "@chakra-ui/react";
+import { Box, Input, InputGroup, InputLeftElement, Stack, Text } from "@chakra-ui/react";
 import { ThemedHeader } from "../components/ThemedHeader";
-
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 import { useSetStep } from '../context/StepContext'
-
 
 export type ArtistMetadata = {
     artistName: string
@@ -14,6 +12,15 @@ export type ArtistMetadata = {
     imageUrl?: string
 }
 
+function SearchIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+    );
+}
+
 export function ChooseArtist() {
 
     const setStep = useSetStep()
@@ -21,10 +28,7 @@ export function ChooseArtist() {
         setStep(0)
     }, [setStep])
 
-
-
     const [listOfArtists, setListofArtists] = useState<ArtistMetadata[]>([]);
-    // Component State
     const [artistInput, setArtistInput] = useState('');
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +39,7 @@ export function ChooseArtist() {
         const fetchData = async () => {
             try {
                 const response = await fetch(
-                    `https://setlist-to-playlist-api.vercel.app/artists?artist=${artistInput}`
+                    `${import.meta.env.VITE_API_URL}/artists?artist=${artistInput}`
                 );
                 const jsonData = await response.json();
                 setListofArtists(jsonData);
@@ -51,27 +55,44 @@ export function ChooseArtist() {
     }, [artistInput]);
 
     return (
-        <>
-            <br />
-            <ThemedHeader>Choose Your Artist...</ThemedHeader>
-            <br />
-            <Input
-                value={artistInput}
-                placeholder='i.e. Genesis...'
-                onChange={handleChange}
-                size='sm'
-            />
-            <br />
-            <br />
-            <Stack spacing={5} width="100%">
-                {listOfArtists.length > 0 ? (
-                    listOfArtists.map((i, index) => (
-                        <ArtistCard key={index} artist={i} />
-                    ))
-                ) : (
-                    <p>No data available.</p>
-                )}
-            </Stack>
-        </>
+        <Box maxW='680px' mx='auto' px={4} pt={8} pb={4} w='100%'>
+            <ThemedHeader mb={6}>Choose Your Artist</ThemedHeader>
+            <InputGroup mb={6} size='lg'>
+                <InputLeftElement pointerEvents='none' color='text.muted' pl={1}>
+                    <SearchIcon />
+                </InputLeftElement>
+                <Input
+                    value={artistInput}
+                    placeholder='Search for an artist...'
+                    onChange={handleChange}
+                    bg='bg.card'
+                    borderColor='border.subtle'
+                    color='text.primary'
+                    _placeholder={{ color: 'text.muted' }}
+                    _hover={{ borderColor: 'accent.green' }}
+                    _focus={{
+                        borderColor: 'accent.green',
+                        boxShadow: '0 0 0 1px var(--chakra-colors-accent-green)',
+                    }}
+                    borderRadius='xl'
+                    fontSize='md'
+                />
+            </InputGroup>
+            {listOfArtists.length > 0 ? (
+                <Stack spacing={3} w='100%'>
+                    {listOfArtists.map((artist, index) => (
+                        <ArtistCard key={index} artist={artist} />
+                    ))}
+                </Stack>
+            ) : artistInput.length > 0 ? (
+                <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
+                    No artists found for "{artistInput}"
+                </Text>
+            ) : (
+                <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
+                    Start typing to search for an artist...
+                </Text>
+            )}
+        </Box>
     );
 }

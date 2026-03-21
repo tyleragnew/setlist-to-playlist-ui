@@ -16,32 +16,30 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                 w='100%'
                 pt={2}
                 pb={1}
-                mb={2}
+                mb={1}
+                bg='bg.surface'
             >
                 <Box
                     display='flex'
                     flexDirection='row'
                     alignItems='center'
-                    bg='rgba(40,40,40,0.85)'
+                    bg='bg.overlay'
                     px={3}
-                    py={1}
-                    borderRadius='lg'
-                    boxShadow='0 2px 12px rgba(30,185,84,0.18)'
-                    border='2px solid'
-                    borderColor='spotify.green'
+                    py={1.5}
+                    borderRadius='full'
+                    border='1.5px solid'
+                    borderColor='accent.green'
+                    boxShadow='0 2px 12px rgba(29,185,84,0.15)'
                 >
                     {image && (
                         <Box
-                            boxSize='40px'
+                            boxSize='32px'
                             borderRadius='full'
                             overflow='hidden'
-                            border='3px solid'
-                            borderColor='spotify.green'
-                            bg='spotify.black'
-                            display='flex'
-                            alignItems='center'
-                            justifyContent='center'
-                            mr={3}
+                            border='2px solid'
+                            borderColor='accent.green'
+                            mr={2}
+                            flexShrink={0}
                         >
                             <img
                                 src={image}
@@ -50,44 +48,41 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                             />
                         </Box>
                     )}
-                    <Box display='flex' flexDirection='column' alignItems='flex-start'>
-                        <Text fontWeight='bold' fontSize='md' color='spotify.green' mb={0} fontFamily='heading'>
-                            {displayName}
-                        </Text>
-                        <Text fontSize='xs' color='spotify.white' opacity={0.8} fontStyle='italic' letterSpacing='wider' mb={0}>
-                            Logged in
-                        </Text>
-                    </Box>
+                    <Text fontWeight='semibold' fontSize='sm' color='text.primary' mr={1.5}>
+                        {displayName}
+                    </Text>
+                    <Text fontSize='xs' color='accent.green' fontWeight='medium'>
+                        ●
+                    </Text>
                 </Box>
             </Box>
+
             {/* Desktop: fixed top right */}
             <Box
                 position='fixed'
-                top={6}
-                right={8}
+                top={5}
+                right={6}
                 zIndex={200}
                 display={{ base: 'none', md: 'flex' }}
                 alignItems='center'
-                bg='rgba(40,40,40,0.85)'
+                bg='bg.overlay'
                 px={3}
                 py={2}
-                borderRadius='lg'
-                boxShadow='0 2px 12px rgba(30,185,84,0.18)'
-                border='2px solid'
-                borderColor='spotify.green'
+                borderRadius='full'
+                border='1.5px solid'
+                borderColor='accent.green'
+                boxShadow='0 2px 16px rgba(29,185,84,0.18)'
+                backdropFilter='blur(12px)'
             >
                 {image && (
                     <Box
-                        boxSize='56px'
+                        boxSize='36px'
                         borderRadius='full'
                         overflow='hidden'
-                        border='3px solid'
-                        borderColor='spotify.green'
-                        mr={3}
-                        bg='spotify.black'
-                        display='flex'
-                        alignItems='center'
-                        justifyContent='center'
+                        border='2px solid'
+                        borderColor='accent.green'
+                        mr={2}
+                        flexShrink={0}
                     >
                         <img
                             src={image}
@@ -96,11 +91,11 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                         />
                     </Box>
                 )}
-                <Text fontWeight='bold' fontSize='xl' color='spotify.green' mr={2} fontFamily='heading'>
+                <Text fontWeight='semibold' fontSize='sm' color='text.primary' mr={2}>
                     {displayName}
                 </Text>
-                <Text fontSize='sm' color='spotify.white' opacity={0.8} fontStyle='italic' letterSpacing='wider' ml={1} textShadow='0 1px 4px rgba(0,0,0,0.18)'>
-                    Logged in
+                <Text fontSize='xs' color='accent.green' fontWeight='bold'>
+                    ●
                 </Text>
             </Box>
         </>

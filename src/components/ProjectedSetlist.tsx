@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Button, OrderedList, ListItem } from "@chakra-ui/react";
+import { Button, Box, Text, Divider } from "@chakra-ui/react";
 import { useListenerContext } from "../context/ListenerContext";
 
 export function ProjectedSetlist() {
@@ -14,7 +14,7 @@ export function ProjectedSetlist() {
     const fetchData = async () => {
         try {
             const response = await fetch(
-                `https://setlist-to-playlist-api.vercel.app/playlists`,
+                `${import.meta.env.VITE_API_URL}/playlists`,
                 {
                     method: 'POST',
                     headers: {
@@ -34,17 +34,58 @@ export function ProjectedSetlist() {
         }
     };
 
+    const songs = setlistMetadata?.songs ?? [];
+
     return (
-        <>
-            <OrderedList>
-                {(setlistMetadata?.songs ?? []).map((song: string, index: number) => (
-                    <ListItem key={index}>{song}</ListItem>
+        <Box>
+            <Text fontSize='xs' fontWeight='semibold' color='text.muted' mb={3} textTransform='uppercase' letterSpacing='wide'>
+                {songs.length} song{songs.length !== 1 ? 's' : ''}
+            </Text>
+            <Box
+                bg='bg.page'
+                borderRadius='lg'
+                border='1px solid'
+                borderColor='border.subtle'
+                overflow='hidden'
+                mb={4}
+                maxH='320px'
+                overflowY='auto'
+            >
+                {songs.map((song: string, index: number) => (
+                    <Box key={index}>
+                        <Box
+                            display='flex'
+                            alignItems='center'
+                            px={4}
+                            py={2.5}
+                            gap={3}
+                            _hover={{ bg: 'border.subtle' }}
+                            transition='background-color 0.15s ease'
+                        >
+                            <Text fontSize='sm' color='text.muted' w='24px' textAlign='right' flexShrink={0}>
+                                {index + 1}
+                            </Text>
+                            <Text fontSize='sm' color='text.primary' flex='1' noOfLines={1}>
+                                {song}
+                            </Text>
+                        </Box>
+                        {index < songs.length - 1 && <Divider borderColor='border.subtle' />}
+                    </Box>
                 ))}
-            </OrderedList>
-            <br />
-            <Button onClick={handleClick} isDisabled={!token} title={!token ? 'Sign in to Spotify to generate playlist' : undefined}>
+            </Box>
+            <Button
+                onClick={handleClick}
+                isDisabled={!token}
+                title={!token ? 'Sign in to Spotify to generate playlist' : undefined}
+                colorScheme='spotify'
+                size='lg'
+                w='100%'
+                borderRadius='full'
+                fontWeight='bold'
+                fontSize='md'
+            >
                 Generate My Playlist!
             </Button>
-        </>
+        </Box>
     );
 }

@@ -10,15 +10,13 @@ export function SetSetlistMetadata() {
     useEffect(() => { setStep(1); }, [setStep]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
 
-    // Number of sets slider state
     const [numberOfSets, setNumberOfSets] = useState(10);
 
-    // @TODO - add debouncing here instead of using OnBlur event.
     const fetchData = async () => {
         if (!chosenArtist) return;
         try {
             const response = await fetch(
-                `https://setlist-to-playlist-api.vercel.app/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=${numberOfSets}`
+                `${import.meta.env.VITE_API_URL}/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=${numberOfSets}`
             );
             const jsonData = await response.json();
             setSetlistMetadata(jsonData);
@@ -28,7 +26,6 @@ export function SetSetlistMetadata() {
         }
     };
 
-    // Fetched image URL for the chosen artist
     const [artistImage, setArtistImage] = useState<string>("");
     const [imageLoading, setImageLoading] = useState<boolean>(false);
 
@@ -38,7 +35,7 @@ export function SetSetlistMetadata() {
             setImageLoading(true);
             try {
                 const response = await fetch(
-                    `https://setlist-to-playlist-api.vercel.app/artists/image?artist=${encodeURIComponent(chosenArtist.artistName)}`,
+                    `${import.meta.env.VITE_API_URL}/artists/image?artist=${encodeURIComponent(chosenArtist.artistName)}`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -61,18 +58,18 @@ export function SetSetlistMetadata() {
         <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' px={{ base: 2, md: 0 }} pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
             <Box
                 w={{ base: '100%', sm: '90%', md: '540px' }}
-                bg='rgba(25,20,20,0.92)'
-                boxShadow='0 8px 32px rgba(0,0,0,0.18)'
+                bg='bg.card'
+                boxShadow={{ base: 'none', md: '0 8px 32px rgba(0,0,0,0.1)' }}
                 borderRadius='2xl'
+                border='1px solid'
+                borderColor='border.subtle'
                 p={{ base: 4, md: 8 }}
-                style={{ backdropFilter: 'blur(12px)' }}
             >
-                {/* Artist image and name in a row */}
                 {chosenArtist?.artistName && (
-                    <Box display="flex" flexDirection="row" alignItems="center" mb={2} justifyContent="center">
+                    <Box display="flex" flexDirection="row" alignItems="center" mb={6} justifyContent="center" gap={4}>
                         {imageLoading || !artistImage ? (
-                            <Box boxSize="80px" display="flex" alignItems="center" justifyContent="center" mr={4}>
-                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <Box boxSize="72px" display="flex" alignItems="center" justifyContent="center" flexShrink={0}>
+                                <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="20" cy="20" r="18" stroke="#1DB954" strokeWidth="4" opacity="0.2" />
                                     <path d="M20 4a16 16 0 1 1-16 16" stroke="#1DB954" strokeWidth="4" strokeLinecap="round" />
                                 </svg>
@@ -81,65 +78,81 @@ export function SetSetlistMetadata() {
                             <Image
                                 src={artistImage}
                                 alt={chosenArtist.artistName}
-                                boxSize="80px"
+                                boxSize="72px"
                                 borderRadius="full"
-                                border="2px solid #1DB954"
+                                border="2px solid"
+                                borderColor="accent.green"
                                 objectFit="cover"
-                                mr={4}
+                                flexShrink={0}
                             />
                         )}
-                        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='spotify.white' textAlign='left'>
+                        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight='bold' color='text.primary' textAlign='left'>
                             {chosenArtist.artistName}
                         </Text>
                     </Box>
                 )}
-                <Text fontSize='md' color='spotify.green' textAlign='center' mb={4}>
-                    Include the last X sets for {chosenArtist?.artistName ?? 'the artist'}
+
+                <Text fontSize='sm' color='text.muted' textAlign='center' mb={5}>
+                    Include the last <Text as='span' color='accent.green' fontWeight='bold'>{numberOfSets}</Text> sets for{' '}
+                    <Text as='span' fontWeight='semibold' color='text.primary'>{chosenArtist?.artistName ?? 'the artist'}</Text>
                 </Text>
-                <FormControl mb={2}>
-                    <Text fontSize='md' color='spotify.white' mb={2} textAlign='center'>
-                        Number of sets: <b>{numberOfSets}</b>
-                    </Text>
-                    <Box px={2} mb={3}>
-                        {/* Slider for 5, 10, 20 */}
-                        <Box position='relative'>
-                            <input
-                                type='range'
-                                min={0}
-                                max={2}
-                                step={1}
-                                value={[5, 10, 20].indexOf(numberOfSets)}
-                                onChange={e => setNumberOfSets([5, 10, 20][parseInt(e.target.value)])}
-                                style={{ width: '100%' }}
-                            />
-                            <Box display='flex' justifyContent='space-between' mt={1} px={1}>
-                                <Text fontSize='sm' color='spotify.green'>5</Text>
-                                <Text fontSize='sm' color='spotify.green'>10</Text>
-                                <Text fontSize='sm' color='spotify.green'>20</Text>
-                            </Box>
+
+                <FormControl mb={5}>
+                    <Box px={2} mb={4}>
+                        <input
+                            type='range'
+                            min={0}
+                            max={2}
+                            step={1}
+                            value={[5, 10, 20].indexOf(numberOfSets)}
+                            onChange={e => setNumberOfSets([5, 10, 20][parseInt(e.target.value)])}
+                            style={{ width: '100%', accentColor: '#1DB954' }}
+                        />
+                        <Box display='flex' justifyContent='space-between' mt={1} px={1}>
+                            <Text fontSize='xs' color='text.muted'>5</Text>
+                            <Text fontSize='xs' color='text.muted'>10</Text>
+                            <Text fontSize='xs' color='text.muted'>20</Text>
                         </Box>
                     </Box>
-                    <RadioGroup defaultValue='1'>
-                        <Stack spacing={4} direction={{ base: 'column', md: 'row' }} align='center' justify='center'>
-                            <Radio value='1' colorScheme='spotify'>Include Songs on Tape</Radio>
-                            <Radio value='2' colorScheme='spotify'>Don't Include Songs on Tape</Radio>
-                        </Stack>
-                    </RadioGroup>
+
+                    <Box
+                        bg='bg.page'
+                        borderRadius='xl'
+                        border='1px solid'
+                        borderColor='border.subtle'
+                        p={4}
+                        mb={4}
+                    >
+                        <RadioGroup defaultValue='1'>
+                            <Stack spacing={3} direction={{ base: 'column', md: 'row' }} align='center' justify='center'>
+                                <Radio value='1' colorScheme='brand' size='md'>
+                                    <Text fontSize='sm' color='text.primary'>Include Songs on Tape</Text>
+                                </Radio>
+                                <Radio value='2' colorScheme='brand' size='md'>
+                                    <Text fontSize='sm' color='text.primary'>Don't Include Songs on Tape</Text>
+                                </Radio>
+                            </Stack>
+                        </RadioGroup>
+                    </Box>
+
+                    <Button
+                        colorScheme='spotify'
+                        size='lg'
+                        w='100%'
+                        borderRadius='full'
+                        fontWeight='bold'
+                        onClick={fetchData}
+                        disabled={!chosenArtist}
+                    >
+                        Generate Projected Setlist
+                    </Button>
                 </FormControl>
-                <Button
-                    colorScheme='spotify'
-                    size='lg'
-                    w='100%'
-                    borderRadius='full'
-                    fontWeight='bold'
-                    fontSize='lg'
-                    boxShadow='0 2px 8px rgba(30,185,84,0.12)'
-                    onClick={fetchData}
-                    disabled={!chosenArtist}
-                >
-                    Generate Projected Setlist
-                </Button>
-                {setlistLoaded ? <Box mt={6}><ProjectedSetlist /></Box> : null}
+
+                {setlistLoaded && (
+                    <Box mt={2} pt={4} borderTop='1px solid' borderColor='border.subtle'>
+                        <ProjectedSetlist />
+                    </Box>
+                )}
             </Box>
         </Stack>
     );

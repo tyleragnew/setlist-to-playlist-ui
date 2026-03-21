@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChakraProvider, Box } from '@chakra-ui/react'
+import { ChakraProvider, Box, localStorageManager } from '@chakra-ui/react'
 import { SpotifyProfile } from './components/SpotifyProfile';
 import theme from './theme'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
@@ -13,8 +13,6 @@ import './App.css'
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
 import { Callback } from './pages/Callback';
-
-// re-use ListenerContext and associated types from src/context/ListenerContext
 
 function App() {
   const location = useLocation();
@@ -45,13 +43,11 @@ function App() {
           setSetlistLoaded,
         }}>
         <StepProvider>
-          <ChakraProvider theme={theme}>
-            {/* Responsive Spotify profile section */}
+          <ChakraProvider theme={theme} colorModeManager={localStorageManager}>
             {token && profile && (
               <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
             )}
-            <Box bg='spotify.black' minH='100vh' display='flex' flexDirection='column'>
-              {/* Add top margin to header on desktop to avoid overlap with fixed profile */}
+            <Box bg='bg.page' minH='100vh' display='flex' flexDirection='column'>
               <Box mt={{ base: 0, md: 20 }}>
                 <StepHeader />
               </Box>
@@ -67,10 +63,9 @@ function App() {
             </Box>
           </ChakraProvider>
         </StepProvider>
-      </ListenerContext.Provider >
+      </ListenerContext.Provider>
     </>
   );
-  // ...existing code...
 }
 
 export default App
