@@ -2,17 +2,14 @@ import { useEffect, useState } from 'react';
 
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
+const callbackURL = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || `${window.location.origin}/callback`;
 
 export function Callback() {
-    const [message, setMessage] = useState('Completing sign-in...');
+    const code = new URLSearchParams(window.location.search).get('code');
+    const [message, setMessage] = useState(code ? 'Completing sign-in...' : 'No code provided');
 
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        if (!code) {
-            setMessage('No code provided');
-            return;
-        }
+        if (!code) return;
 
         (async () => {
             try {
@@ -21,7 +18,7 @@ export function Callback() {
                     client_id: clientId,
                     grant_type: 'authorization_code',
                     code,
-                    redirect_uri: window.location.origin + '/callback',
+                    redirect_uri: callbackURL,
                     code_verifier: codeVerifier,
                 });
 
@@ -40,8 +37,9 @@ export function Callback() {
                 }
 
                 // remove code param and navigate home so the main app can pick up stored tokens
-                urlParams.delete('code');
-                const newSearch = urlParams.toString();
+                const params = new URLSearchParams(window.location.search);
+                params.delete('code');
+                const newSearch = params.toString();
                 const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
                 window.history.replaceState({}, '', newUrl);
 
@@ -54,7 +52,7 @@ export function Callback() {
                 setMessage('Sign-in failed. Check console for details.');
             }
         })();
-    }, []);
+    }, [code]);
 
     return <div>{message}</div>;
 }

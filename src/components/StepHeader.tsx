@@ -9,8 +9,6 @@ import {
     StepStatus,
     StepTitle,
     Stepper,
-    Button,
-    Stack,
     HStack,
     Circle,
     Text
@@ -34,14 +32,10 @@ export function StepHeader() {
     const { isAuthenticated, profile } = useAuth()
 
     const goTo = (idx: number) => {
-        if (idx < 0 || idx >= steps.length) return
+        if (idx < 0 || idx >= activeStep) return
         setStep(idx)
-        const path = steps[idx].path
-        navigate(path)
+        navigate(steps[idx].path)
     }
-
-    const onPrev = () => goTo(activeStep - 1)
-    const onNext = () => goTo(activeStep + 1)
 
     return (
         <>
@@ -59,7 +53,20 @@ export function StepHeader() {
                 borderColor='border.subtle'
             >
                 <HStack w='100%' justify='space-between' align='center' mb={1}>
-                    <Box w='32px' /> {/* spacer */}
+                    <Box
+                        w='32px'
+                        as='button'
+                        onClick={() => goTo(activeStep - 1)}
+                        visibility={activeStep > 0 ? 'visible' : 'hidden'}
+                        color='text.muted'
+                        _hover={{ color: 'accent.green' }}
+                        transition='color 0.15s ease'
+                        aria-label='Go back'
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                    </Box>
                     <Box textAlign='center'>
                         <Text fontSize='xs' color='accent.green' fontWeight='semibold' letterSpacing='wide' textTransform='uppercase'>
                             {`Step ${activeStep + 1} of ${steps.length}`}
@@ -92,7 +99,13 @@ export function StepHeader() {
                 <Box maxW='960px' mx='auto' px={4} position='relative'>
                     <Stepper index={activeStep} colorScheme='brand' size='lg' gap={8}>
                         {steps.map((step, index) => (
-                            <Step key={index}>
+                            <Step
+                                key={index}
+                                onClick={() => index < activeStep && goTo(index)}
+                                cursor={index < activeStep ? 'pointer' : 'default'}
+                                _hover={index < activeStep ? { opacity: 0.8 } : {}}
+                                transition='opacity 0.15s ease'
+                            >
                                 <StepIndicator boxSize='44px'>
                                     <StepStatus
                                         complete={<StepIcon boxSize='24px' />}
@@ -129,53 +142,18 @@ export function StepHeader() {
                             </Step>
                         ))}
                     </Stepper>
-                    {/* Color mode toggle top-right of stepper bar */}
-                    <Box position='absolute' top='50%' right={4} transform='translateY(-50%)'>
-                        <ColorModeToggle />
-                    </Box>
                 </Box>
             </Box>
 
-            {/* footer: sticky nav buttons */}
+            {/* desktop: fixed bottom-right toggle */}
             <Box
-                as="footer"
-                position="fixed"
-                bottom={0}
-                left={0}
-                right={0}
-                width="100%"
-                display="flex"
-                justifyContent="center"
-                zIndex={9999}
-                px={{ base: 3, md: 0 }}
-                bg='bg.surface'
-                borderTop='1px solid'
-                borderColor='border.subtle'
-                backdropFilter='blur(12px)'
+                display={{ base: 'none', md: 'block' }}
+                position='fixed'
+                bottom={5}
+                right={5}
+                zIndex={10}
             >
-                <Box width={{ base: '100%', md: 'auto' }} maxW='720px' boxSizing='border-box' py={3}>
-                    <Stack direction={{ base: 'column', md: 'row' }} spacing={3} align="center">
-                        <Button
-                            onClick={onPrev}
-                            isDisabled={activeStep <= 0}
-                            size={{ base: 'sm', md: 'md' }}
-                            w={{ base: '100%', md: 'auto' }}
-                            variant='outline'
-                            colorScheme='spotify'
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            onClick={onNext}
-                            colorScheme='spotify'
-                            isDisabled={activeStep >= steps.length - 1}
-                            size={{ base: 'sm', md: 'md' }}
-                            w={{ base: '100%', md: 'auto' }}
-                        >
-                            Next
-                        </Button>
-                    </Stack>
-                </Box>
+                <ColorModeToggle />
             </Box>
         </>
     )

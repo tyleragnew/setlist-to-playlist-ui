@@ -3,9 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
 const authorizationEndpoint = 'https://accounts.spotify.com/authorize';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
-// Resolve redirect URI from env (Vite) or fallback to current origin + /callback
-const defaultRedirect = typeof window !== 'undefined' ? `${window.location.origin}/callback` : 'https://setlist-to-playlist-ui.vercel.app/callback';
-const callbackURL = (import.meta as any).env?.VITE_SPOTIFY_REDIRECT_URI ?? defaultRedirect;
+const callbackURL = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || `${window.location.origin}/callback`;
 
 type TokenResponse = {
     access_token?: string;
@@ -110,31 +108,15 @@ export function useAuth() {
     }, [token, expiry]);
 
     useEffect(() => {
-        // If there's no token, but a code param exists, exchange it.
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        console.debug('[useAuth] token:', Boolean(token), 'code present:', Boolean(code), 'callbackURL:', callbackURL);
-        if (code && !token) {
-            void exchangeCodeForToken(code);
-            return;
-        }
+        // Don't redirect if we're on the callback page — let Callback handle the exchange
+        if (window.location.pathname === '/callback') return;
 
-        // If no code and no token on initial mount, start PKCE flow (redirect to Spotify)
-        if (!code && !token) {
+        // If no token on initial mount, start PKCE flow (redirect to Spotify)
+        if (!token) {
             void startPKCE();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // Watch token and always redirect to Spotify auth flow whenever the token becomes falsy.
-    useEffect(() => {
-        if (token) return;
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        if (!code) {
-            void startPKCE();
-        }
-    }, [token]);
 
     async function exchangeCodeForToken(code: string) {
         const codeVerifier = localStorage.getItem('code_verifier') ?? '';

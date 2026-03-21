@@ -7,8 +7,10 @@ export function ProjectedSetlist() {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        void fetchData();
+        setPlaylistMetadata(null);
+        setSetlistLoaded(false);
         navigate("/playlist");
+        void fetchData();
     };
 
     const fetchData = async () => {
@@ -84,7 +86,7 @@ export function ProjectedSetlist() {
                 fontWeight='bold'
                 fontSize='md'
             >
-                Generate My Playlist!
+                Save to Spotify
             </Button>
         </Box>
     );
