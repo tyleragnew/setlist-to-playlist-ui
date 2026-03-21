@@ -43,6 +43,7 @@ export function StepHeader() {
             <Box
                 px={3}
                 py={2}
+                h='72px'
                 display={{ base: 'flex', md: 'none' }}
                 flexDirection='column'
                 alignItems='center'
@@ -67,7 +68,7 @@ export function StepHeader() {
                             <polyline points="15 18 9 12 15 6" />
                         </svg>
                     </Box>
-                    <Box textAlign='center'>
+                    <Box textAlign='center' flex='1'>
                         <Text fontSize='xs' color='accent.green' fontWeight='semibold' letterSpacing='wide' textTransform='uppercase'>
                             {`Step ${activeStep + 1} of ${steps.length}`}
                         </Text>
