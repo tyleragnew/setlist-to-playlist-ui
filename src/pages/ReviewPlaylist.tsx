@@ -15,7 +15,7 @@ export function ReviewPlaylist() {
     }, [setStep])
 
     return (
-        <Box maxW='800px' mx='auto' px={4} pt={8} pb={4} w='100%'>
+        <Box mx='auto' pt={8} pb={4} w='100%'>
             {setlistLoaded ? (
                 <VStack spacing={6} align='stretch'>
                     <ThemedHeader>

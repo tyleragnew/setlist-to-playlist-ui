@@ -55,9 +55,9 @@ export function SetSetlistMetadata() {
     }, [chosenArtist, token]);
 
     return (
-        <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' px={{ base: 2, md: 0 }} pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
+        <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
             <Box
-                w={{ base: '100%', sm: '90%', md: '540px' }}
+                w='100%'
                 bg='bg.card'
                 boxShadow={{ base: 'none', md: '0 8px 32px rgba(0,0,0,0.1)' }}
                 borderRadius='2xl'

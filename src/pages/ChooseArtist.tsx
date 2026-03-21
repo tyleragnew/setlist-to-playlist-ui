@@ -55,7 +55,7 @@ export function ChooseArtist() {
     }, [artistInput]);
 
     return (
-        <Box maxW='680px' mx='auto' px={4} pt={8} pb={4} w='100%'>
+        <Box mx='auto' pt={8} pb={4} w='100%'>
             <ThemedHeader mb={6}>Choose Your Artist</ThemedHeader>
             <InputGroup mb={6} size='lg'>
                 <InputLeftElement pointerEvents='none' color='text.muted' pl={1}>
