@@ -45,7 +45,7 @@ function App() {
         <StepProvider>
           <ChakraProvider theme={theme} colorModeManager={localStorageManager}>
             <Box bg='bg.page' minH='100vh' display='flex' flexDirection='column' alignItems='center'>
-              <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 20 }}>
+              <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
                 {token && profile && (
                   <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
                 )}

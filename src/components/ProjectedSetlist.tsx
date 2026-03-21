@@ -37,12 +37,29 @@ export function ProjectedSetlist() {
     };
 
     const songs = setlistMetadata?.songs ?? [];
+    const similarity = setlistMetadata?.similarity;
 
     return (
         <Box>
-            <Text fontSize='xs' fontWeight='semibold' color='text.muted' mb={3} textTransform='uppercase' letterSpacing='wide'>
-                {songs.length} song{songs.length !== 1 ? 's' : ''}
-            </Text>
+            <Box display='flex' justifyContent='space-between' alignItems='baseline' mb={3}>
+                <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide'>
+                    {songs.length} song{songs.length !== 1 ? 's' : ''}
+                </Text>
+                {similarity != null && (
+                    <Box display='flex' alignItems='baseline' gap={1.5}>
+                        <Text fontSize='xs' color='text.muted' textTransform='uppercase' letterSpacing='wide'>
+                            Setlist Similarity
+                        </Text>
+                        <Text
+                            fontSize='sm'
+                            fontWeight='bold'
+                            color={similarity >= 70 ? 'accent.green' : similarity >= 40 ? 'orange.400' : 'red.400'}
+                        >
+                            {similarity}%
+                        </Text>
+                    </Box>
+                )}
+            </Box>
             <Box
                 bg='bg.page'
                 borderRadius='lg'
@@ -91,7 +108,7 @@ export function ProjectedSetlist() {
                 fontWeight='bold'
                 fontSize='md'
             >
-                Save to Spotify
+                Generate & Save to Spotify
             </Button>
         </Box>
     );

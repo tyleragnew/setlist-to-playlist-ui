@@ -9,6 +9,7 @@ export type PlaylistMetadata = {
 
 export type SetlistMetadata = {
     songs?: string[];
+    similarity?: number;
 };
 
 export type ListenerContextType = {
