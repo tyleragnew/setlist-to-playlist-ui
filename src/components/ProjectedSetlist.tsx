@@ -75,9 +75,14 @@ export function ProjectedSetlist() {
                     </Box>
                 ))}
             </Box>
+            {songs.length === 0 && (
+                <Text fontSize='sm' color='orange.400' textAlign='center' mb={3}>
+                    No setlist data found for this artist. Try including more sets.
+                </Text>
+            )}
             <Button
                 onClick={handleClick}
-                isDisabled={!token}
+                isDisabled={!token || songs.length === 0}
                 title={!token ? 'Sign in to Spotify to generate playlist' : undefined}
                 colorScheme='spotify'
                 size='lg'

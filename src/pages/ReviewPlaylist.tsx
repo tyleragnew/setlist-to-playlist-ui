@@ -1,4 +1,4 @@
-import { AspectRatio, Box, Button, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
 import { ThemedHeader } from "../components/ThemedHeader";
 import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,10 @@ export function ReviewPlaylist() {
     useEffect(() => {
         setStep(2)
     }, [setStep])
+
+    useEffect(() => {
+        if (!chosenArtist) navigate('/', { replace: true });
+    }, [chosenArtist, navigate])
 
     return (
         <Box mx='auto' pt={8} pb={4} w='100%'>
@@ -29,15 +33,14 @@ export function ReviewPlaylist() {
                         borderColor='border.subtle'
                         boxShadow='0 4px 24px rgba(0,0,0,0.1)'
                     >
-                        <AspectRatio ratio={1} maxH='380px'>
-                            <iframe
-                                src={(playlistMetadata?.embedURL ?? '').toString()}
-                                width="100%"
-                                height="352"
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                                loading="lazy"
-                            />
-                        </AspectRatio>
+                        <iframe
+                            src={(playlistMetadata?.embedURL ?? '').toString()}
+                            width="100%"
+                            height="600"
+                            style={{ border: 'none' }}
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"
+                        />
                     </Box>
 
                     {(playlistMetadata?.unmappedSongs ?? []).length > 0 ? (

@@ -111,14 +111,14 @@ export function StepHeader() {
                                     <StepStatus
                                         complete={<StepIcon boxSize='24px' />}
                                         incomplete={
-                                            <Text fontSize='xl' color='text.muted'>
+                                            <Box as='span' fontSize='xl' color='text.muted'>
                                                 <StepNumber />
-                                            </Text>
+                                            </Box>
                                         }
                                         active={
-                                            <Text fontSize='xl' color='accent.green' fontWeight='bold'>
+                                            <Box as='span' fontSize='xl' color='accent.green' fontWeight='bold'>
                                                 <StepNumber />
-                                            </Text>
+                                            </Box>
                                         }
                                     />
                                 </StepIndicator>

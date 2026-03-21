@@ -30,21 +30,38 @@ export function ChooseArtist() {
 
     const [listOfArtists, setListofArtists] = useState<ArtistMetadata[]>([]);
     const [artistInput, setArtistInput] = useState('');
+    const [searching, setSearching] = useState(false);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setArtistInput(event.target.value);
+        const value = event.target.value;
+        setArtistInput(value);
+        if (!value.trim()) {
+            setListofArtists([]);
+        }
     };
 
     useEffect(() => {
+        if (!artistInput.trim()) {
+            setListofArtists([]);
+            setSearching(false);
+            return;
+        }
+
+        setSearching(true);
+
         const fetchData = async () => {
             try {
                 const response = await fetch(
                     `${import.meta.env.VITE_API_URL}/artists?artist=${artistInput}`
                 );
-                const jsonData = await response.json();
-                setListofArtists(jsonData);
+                if (!response.ok) return;
+                const text = await response.text();
+                if (!text) return;
+                setListofArtists(JSON.parse(text));
             } catch (error) {
                 console.error('Error fetching data:', error);
+            } finally {
+                setSearching(false);
             }
         };
 
@@ -84,15 +101,11 @@ export function ChooseArtist() {
                         <ArtistCard key={index} artist={artist} />
                     ))}
                 </Stack>
-            ) : artistInput.length > 0 ? (
+            ) : searching ? null : artistInput.length > 0 ? (
                 <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
                     No artists found for "{artistInput}"
                 </Text>
-            ) : (
-                <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
-                    Start typing to search for an artist...
-                </Text>
-            )}
+            ) : null}
         </Box>
     );
 }

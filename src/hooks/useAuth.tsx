@@ -20,8 +20,11 @@ export function useAuth() {
         return v ? Number(v) : null;
     });
 
-    // Spotify profile state
-    const [profile, setProfile] = useState<{ displayName: string; image: string | null } | null>(null);
+    // Spotify profile state — seed from cache to avoid flash
+    const [profile, setProfile] = useState<{ displayName: string; image: string | null } | null>(() => {
+        const cached = localStorage.getItem('spotify_profile');
+        return cached ? JSON.parse(cached) : null;
+    });
 
     const refreshTimer = useRef<number | null>(null);
 
@@ -40,10 +43,12 @@ export function useAuth() {
                 });
                 if (!res.ok) throw new Error('Failed to fetch Spotify profile');
                 const json = await res.json();
-                setProfile({
+                const p = {
                     displayName: json.display_name ?? json.id ?? 'Spotify User',
                     image: Array.isArray(json.images) && json.images.length > 0 ? json.images[0].url : null,
-                });
+                };
+                setProfile(p);
+                localStorage.setItem('spotify_profile', JSON.stringify(p));
             } catch (err) {
                 setProfile(null);
             }
@@ -196,6 +201,7 @@ export function useAuth() {
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('access_token_expiry');
         localStorage.removeItem('code_verifier');
+        localStorage.removeItem('spotify_profile');
     }
 
     return {

@@ -1,5 +1,6 @@
 import { Button, FormControl, Radio, RadioGroup, Stack, Box, Text, Image } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
 import { useSetStep } from '../context/StepContext'
@@ -7,7 +8,12 @@ import { useSetStep } from '../context/StepContext'
 export function SetSetlistMetadata() {
     const { chosenArtist, setSetlistMetadata, token } = useListenerContext();
     const setStep = useSetStep();
+    const navigate = useNavigate();
     useEffect(() => { setStep(1); }, [setStep]);
+
+    useEffect(() => {
+        if (!chosenArtist) navigate('/', { replace: true });
+    }, [chosenArtist, navigate]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
 
     const [numberOfSets, setNumberOfSets] = useState(10);
