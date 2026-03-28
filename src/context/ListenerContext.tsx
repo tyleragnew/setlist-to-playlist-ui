@@ -10,6 +10,7 @@ export type PlaylistMetadata = {
 export type SongEntry = {
     title: string;
     coverArtist?: string;
+    tape?: boolean;
 };
 
 export type SetlistMetadata = {

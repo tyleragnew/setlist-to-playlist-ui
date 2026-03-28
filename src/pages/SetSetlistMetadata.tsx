@@ -1,4 +1,4 @@
-import { Button, FormControl, Box, Text, Image, Divider, Switch, Stack } from "@chakra-ui/react";
+import { Button, FormControl, Box, Text, Image, Divider, Switch, Stack, Select } from "@chakra-ui/react";
 import { BinarySpinner } from "../components/BinarySpinner";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,12 +18,27 @@ type ArtistShowMeta = {
     artistName: string;
     currentTour: string | null;
     recentShows: ShowInfo[];
+    beginYear: number | null;
+    endYear: number | null;
 };
+
+type SearchMode = 'recent' | 'tour' | 'year';
 
 function formatDate(dateStr: string): string {
     const [day, month, year] = dateStr.split('-');
     const d = new Date(Number(year), Number(month) - 1, Number(day));
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function buildYearOptions(beginYear?: number | null, endYear?: number | null): number[] {
+    const currentYear = new Date().getFullYear();
+    const end = currentYear;
+    const start = beginYear ?? 1960;
+    const years: number[] = [];
+    for (let y = Math.min(end, endYear ?? end); y >= start; y--) {
+        years.push(y);
+    }
+    return years;
 }
 
 export function SetSetlistMetadata() {
@@ -33,12 +48,17 @@ export function SetSetlistMetadata() {
     useEffect(() => { setStep(1); }, [setStep]);
 
     useEffect(() => {
-        if (!chosenArtist) navigate('/', { replace: true });
-    }, [chosenArtist, navigate]);
+        if (!token || !chosenArtist) navigate('/', { replace: true });
+    }, [token, chosenArtist, navigate]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
+    const [setlistLoading, setSetlistLoading] = useState(false);
 
+    const [searchMode, setSearchMode] = useState<SearchMode>('recent');
     const [numberOfSets, setNumberOfSets] = useState(10);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() - 1);
     const [allSongs, setAllSongs] = useState(false);
+    const [includeTape, setIncludeTape] = useState(true);
+    const [breakupMedleys, setBreakupMedleys] = useState(false);
 
     const [showMeta, setShowMeta] = useState<ArtistShowMeta | null>(null);
 
@@ -58,17 +78,39 @@ export function SetSetlistMetadata() {
         })();
     }, [chosenArtist]);
 
+    // Reset preview when mode changes
+    useEffect(() => {
+        setSetlistLoaded(false);
+    }, [searchMode]);
+
     const fetchData = async () => {
         if (!chosenArtist) return;
+        setSetlistLoading(true);
         try {
+            const params = new URLSearchParams({
+                artistMBID: chosenArtist.mbid,
+                allSongs: String(allSongs),
+                mode: searchMode,
+            });
+
+            if (searchMode === 'recent') {
+                params.set('numberOfSets', String(numberOfSets));
+            } else if (searchMode === 'tour' && showMeta?.currentTour) {
+                params.set('tourName', showMeta.currentTour);
+            } else if (searchMode === 'year') {
+                params.set('year', String(selectedYear));
+            }
+
             const response = await fetch(
-                `${import.meta.env.VITE_API_URL}/setlists?artistMBID=${chosenArtist.mbid}&numberOfSets=${numberOfSets}&allSongs=${allSongs}`
+                `${import.meta.env.VITE_API_URL}/setlists?${params}`
             );
             const jsonData = await response.json();
             setSetlistMetadata(jsonData);
             setSetlistLoaded(true);
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            setSetlistLoading(false);
         }
     };
 
@@ -103,6 +145,27 @@ export function SetSetlistMetadata() {
     if (imageLoading) {
         return <BinarySpinner size='md' fullScreen />;
     }
+
+    const tourAvailable = !!showMeta?.currentTour;
+
+    const modeOptions: { value: SearchMode; label: string }[] = [
+        { value: 'recent', label: 'Recent' },
+        ...(tourAvailable ? [{ value: 'tour' as SearchMode, label: 'Tour' }] : []),
+        { value: 'year', label: 'Memory' },
+    ];
+
+    const artistName = chosenArtist?.artistName ?? 'this artist';
+
+    const buildPlaylistDescription = (): string => {
+        switch (searchMode) {
+            case 'recent':
+                return `What ${artistName} has been throwing down lately, built from their last ${numberOfSets} shows. Hit play and pretend you're in the front row.`;
+            case 'tour':
+                return `Every banger from the ${showMeta?.currentTour} tour. This is what ${artistName} is playing right now, your cheat sheet before the show.`;
+            case 'year':
+                return `A time capsule from ${selectedYear}. What ${artistName} was playing back then.`;
+        }
+    };
 
     return (
         <Stack minH='calc(100vh - 56px)' align='center' justify='flex-start' pt={{ base: 4, md: 8 }} pb={{ base: 2, md: 4 }}>
@@ -178,15 +241,15 @@ export function SetSetlistMetadata() {
                     </Box>
                 )}
 
-                <Box opacity={setlistLoaded ? 0.6 : 1} transition='opacity 0.3s ease'>
+                <Box>
                     <FormControl mb={5}>
                         <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={3}>
-                            Number of Shows to Analyze
+                            Search Mode
                         </Text>
                         <Box display='flex' gap={2} mb={5}>
-                            {[5, 10, 20].map((n) => (
+                            {modeOptions.map((opt) => (
                                 <Box
-                                    key={n}
+                                    key={opt.value}
                                     as='button'
                                     flex='1'
                                     py={2.5}
@@ -196,17 +259,89 @@ export function SetSetlistMetadata() {
                                     textAlign='center'
                                     cursor='pointer'
                                     transition='all 0.15s ease'
-                                    bg={numberOfSets === n ? 'accent.green' : 'bg.page'}
-                                    color={numberOfSets === n ? 'white' : 'text.muted'}
+                                    bg={searchMode === opt.value ? 'accent.green' : 'bg.page'}
+                                    color={searchMode === opt.value ? 'white' : 'text.muted'}
                                     border='1px solid'
-                                    borderColor={numberOfSets === n ? 'accent.green' : 'border.subtle'}
+                                    borderColor={searchMode === opt.value ? 'accent.green' : 'border.subtle'}
                                     _hover={{ borderColor: 'accent.green' }}
-                                    onClick={() => setNumberOfSets(n)}
+                                    onClick={() => setSearchMode(opt.value)}
                                 >
-                                    {n} shows
+                                    {opt.label}
                                 </Box>
                             ))}
                         </Box>
+
+                        {searchMode === 'recent' && (
+                            <>
+                                <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={3}>
+                                    How Many Shows?
+                                </Text>
+                                <Box display='flex' gap={2} mb={5}>
+                                    {[5, 10, 20].map((n) => (
+                                        <Box
+                                            key={n}
+                                            as='button'
+                                            flex='1'
+                                            py={2.5}
+                                            borderRadius='xl'
+                                            fontWeight='bold'
+                                            fontSize='sm'
+                                            textAlign='center'
+                                            cursor='pointer'
+                                            transition='all 0.15s ease'
+                                            bg={numberOfSets === n ? 'accent.green' : 'bg.page'}
+                                            color={numberOfSets === n ? 'white' : 'text.muted'}
+                                            border='1px solid'
+                                            borderColor={numberOfSets === n ? 'accent.green' : 'border.subtle'}
+                                            _hover={{ borderColor: 'accent.green' }}
+                                            onClick={() => setNumberOfSets(n)}
+                                        >
+                                            {n} shows
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </>
+                        )}
+
+                        {searchMode === 'tour' && showMeta?.currentTour && (
+                            <Box bg='bg.page' borderRadius='xl' border='1px solid' borderColor='border.subtle' p={4} mb={5}>
+                                <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={1}>
+                                    Current Tour
+                                </Text>
+                                <Text fontSize='sm' color='accent.green' fontWeight='bold'>
+                                    {showMeta.currentTour}
+                                </Text>
+                                <Text fontSize='xs' color='text.muted' mt={1}>
+                                    All shows from this tour will be analyzed.
+                                </Text>
+                            </Box>
+                        )}
+
+                        {searchMode === 'year' && (
+                            <>
+                                <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={3}>
+                                    Year
+                                </Text>
+                                <Select
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                                    mb={5}
+                                    bg='bg.page'
+                                    border='1px solid'
+                                    borderColor='border.subtle'
+                                    borderRadius='xl'
+                                    color='text.primary'
+                                    _hover={{ borderColor: 'accent.green' }}
+                                    size='md'
+                                >
+                                    {buildYearOptions(showMeta?.beginYear, showMeta?.endYear).map((y) => (
+                                        <option key={y} value={y} style={{ background: '#1a1a2e' }}>
+                                            {y}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </>
+                        )}
 
                         <Stack spacing={3} mb={5}>
                             <Box>
@@ -264,7 +399,27 @@ export function SetSetlistMetadata() {
                                             Some artists play pre-recorded backing tracks or interludes between songs. Toggle off to exclude these from your playlist.
                                         </Text>
                                     </Box>
-                                    <Switch colorScheme='brand' defaultChecked size='md' ml={4} flexShrink={0} />
+                                    <Switch colorScheme='brand' isChecked={includeTape} onChange={(e) => setIncludeTape(e.target.checked)} size='md' ml={4} flexShrink={0} />
+                                </Box>
+                            </Box>
+
+                            <Box
+                                bg='bg.page'
+                                borderRadius='xl'
+                                border='1px solid'
+                                borderColor='border.subtle'
+                                p={4}
+                            >
+                                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                                    <Box>
+                                        <Text fontSize='sm' color='text.primary' fontWeight='medium'>
+                                            Break Up Medleys
+                                        </Text>
+                                        <Text fontSize='xs' color='text.muted' mt={0.5}>
+                                            Some setlists group multiple songs into a single medley. Toggle on to split them into individual tracks for your playlist.
+                                        </Text>
+                                    </Box>
+                                    <Switch colorScheme='brand' isChecked={breakupMedleys} onChange={(e) => setBreakupMedleys(e.target.checked)} size='md' ml={4} flexShrink={0} />
                                 </Box>
                             </Box>
                         </Stack>
@@ -274,7 +429,7 @@ export function SetSetlistMetadata() {
                                 How song order works
                             </Text>
                             <Text fontSize='xs' color='text.muted' lineHeight='tall'>
-                                Songs are ranked by how frequently they appear across the selected shows. The playlist is then ordered by each song's average position in the setlist — so openers stay at the top and encores land at the end, just like a real show.
+                                Songs are ranked by how frequently they appear across the selected shows. The playlist is then ordered by each song's average position in the setlist, so openers stay at the top and encores land at the end, just like a real show.
                             </Text>
                         </Box>
 
@@ -285,17 +440,27 @@ export function SetSetlistMetadata() {
                             borderRadius='full'
                             fontWeight='bold'
                             onClick={fetchData}
-                            disabled={!chosenArtist}
+                            disabled={!chosenArtist || setlistLoading}
                             variant={setlistLoaded ? 'outline' : 'solid'}
                         >
-                            {setlistLoaded ? 'Refresh Setlist' : 'Preview Setlist'}
+                            {setlistLoading ? 'Loading...' : setlistLoaded ? 'Refresh Setlist' : 'Preview Setlist'}
                         </Button>
                     </FormControl>
                 </Box>
 
+                {setlistLoading && !setlistLoaded && (
+                    <Box mt={6}>
+                        <BinarySpinner size='md' />
+                    </Box>
+                )}
+
                 {setlistLoaded && (
                     <Box mt={2} pt={4} borderTop='1px solid' borderColor='border.subtle'>
-                        <ProjectedSetlist />
+                        <ProjectedSetlist
+                            includeTape={includeTape}
+                            breakupMedleys={breakupMedleys}
+                            playlistDescription={buildPlaylistDescription()}
+                        />
                     </Box>
                 )}
             </Box>

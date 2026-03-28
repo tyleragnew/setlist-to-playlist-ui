@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 
 export function ReviewPlaylist() {
     const navigate = useNavigate();
-    const { setlistLoaded, chosenArtist, playlistMetadata } = useListenerContext();
+    const { token, setlistLoaded, chosenArtist, playlistMetadata } = useListenerContext();
 
     const setStep = useSetStep()
     useEffect(() => {
@@ -16,11 +16,11 @@ export function ReviewPlaylist() {
     }, [setStep])
 
     useEffect(() => {
-        if (!chosenArtist) navigate('/', { replace: true });
-    }, [chosenArtist, navigate])
+        if (!token || !chosenArtist) navigate('/', { replace: true });
+    }, [token, chosenArtist, navigate])
 
     return (
-        <Box mx='auto' pt={8} pb={4} w='100%'>
+        <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
             {setlistLoaded ? (
                 <VStack spacing={6} align='stretch'>
                     <ThemedHeader>

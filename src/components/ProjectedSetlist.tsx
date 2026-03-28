@@ -2,7 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { Button, Box, Text, Divider } from "@chakra-ui/react";
 import { useListenerContext, SongEntry } from "../context/ListenerContext";
 
-export function ProjectedSetlist() {
+type ProjectedSetlistProps = {
+    includeTape?: boolean;
+    breakupMedleys?: boolean;
+    playlistDescription?: string;
+};
+
+export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription }: ProjectedSetlistProps) {
     const { setlistMetadata, chosenArtist, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
@@ -25,7 +31,9 @@ export function ProjectedSetlist() {
                     },
                     body: JSON.stringify({
                         ...setlistMetadata,
+                        songs,
                         artistName: chosenArtist?.artistName,
+                        playlistDescription,
                     }),
                 },
             );
@@ -39,7 +47,15 @@ export function ProjectedSetlist() {
         }
     };
 
-    const songs = setlistMetadata?.songs ?? [];
+    const allSongs = setlistMetadata?.songs ?? [];
+    const filtered = includeTape ? allSongs : allSongs.filter(s => !s.tape);
+    const songs = breakupMedleys
+        ? filtered.flatMap(s =>
+            s.title.includes(' / ')
+                ? s.title.split(' / ').map(t => ({ ...s, title: t.trim() }))
+                : [s]
+        ).filter((s, i, arr) => arr.findIndex(x => x.title.toUpperCase() === s.title.toUpperCase()) === i)
+        : filtered;
     const similarity = setlistMetadata?.similarity;
 
     return (

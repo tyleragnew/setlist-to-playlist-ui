@@ -28,6 +28,9 @@ function App() {
     window.scrollTo(0, 0);
   }, [location]);
 
+  // While waiting for auth redirect, render just the background to avoid flash
+  const isRedirecting = !token && location.pathname !== '/callback';
+
   return (
     <>
       <ListenerContext.Provider
@@ -45,21 +48,23 @@ function App() {
         <StepProvider>
           <ChakraProvider theme={theme} colorModeManager={localStorageManager}>
             <Box bg='bg.page' minH='100vh' display='flex' flexDirection='column' alignItems='center'>
-              <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
-                {token && profile && (
-                  <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
-                )}
-                <StepHeader />
-                <Box flex='1' display='flex' flexDirection='column' justifyContent='flex-start' pb={{ base: 20, md: 16 }}>
-                  <Routes>
-                    <Route path="/" element={<ChooseArtist />} />
-                    <Route path="/callback" element={<Callback />} />
-                    <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
-                    <Route path="/playlist" element={<ReviewPlaylist />} />
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
+              {isRedirecting ? null : (
+                <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
+                  {token && profile && (
+                    <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
+                  )}
+                  <StepHeader />
+                  <Box flex='1' display='flex' flexDirection='column' justifyContent='flex-start' pb={{ base: 20, md: 16 }}>
+                    <Routes>
+                      <Route path="/" element={<ChooseArtist />} />
+                      <Route path="/callback" element={<Callback />} />
+                      <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
+                      <Route path="/playlist" element={<ReviewPlaylist />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Box>
                 </Box>
-              </Box>
+              )}
             </Box>
           </ChakraProvider>
         </StepProvider>
