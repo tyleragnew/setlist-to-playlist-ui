@@ -1,6 +1,5 @@
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Text, VStack } from "@chakra-ui/react";
 import { BinarySpinner } from "../components/BinarySpinner";
-import { ThemedHeader } from "../components/ThemedHeader";
 import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
 import { useSetStep } from '../context/StepContext'
@@ -19,13 +18,26 @@ export function ReviewPlaylist() {
         if (!token || !chosenArtist) navigate('/', { replace: true });
     }, [token, chosenArtist, navigate])
 
+    const trackCount = playlistMetadata?.trackCount ?? 0;
+    const unmapped = playlistMetadata?.unmappedSongs ?? [];
+
     return (
         <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
             {setlistLoaded ? (
-                <VStack spacing={6} align='stretch'>
-                    <ThemedHeader>
-                        {chosenArtist?.artistName ?? 'Your'}'s Setlist Playlist
-                    </ThemedHeader>
+                <VStack spacing={5} align='stretch'>
+                    <Box>
+                        <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight='bold' color='text.primary'>
+                            {chosenArtist?.artistName} Setlist Playlist
+                        </Text>
+                        <Text fontSize='sm' color='text.muted'>
+                            {trackCount} track{trackCount !== 1 ? 's' : ''} from real setlists, saved to your Spotify and ready to play
+                        </Text>
+                        {playlistMetadata?.playlistDescription && (
+                            <Text fontSize='xs' color='text.muted' mt={1}>
+                                {playlistMetadata.playlistDescription}
+                            </Text>
+                        )}
+                    </Box>
 
                     <Box
                         borderRadius='2xl'
@@ -44,37 +56,24 @@ export function ReviewPlaylist() {
                         />
                     </Box>
 
-                    {(playlistMetadata?.unmappedSongs ?? []).length > 0 ? (
+                    {unmapped.length > 0 && (
                         <Box
                             bg='bg.card'
                             border='1px solid'
                             borderColor='border.subtle'
                             borderRadius='xl'
-                            p={5}
+                            p={4}
                         >
-                            <Heading size='sm' color='text.primary' mb={3}>
-                                Songs we couldn't find on Spotify
-                            </Heading>
-                            <VStack align='stretch' spacing={1}>
-                                {(playlistMetadata?.unmappedSongs ?? []).map((song: string, index: number) => (
+                            <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={2}>
+                                Not found on Spotify ({unmapped.length})
+                            </Text>
+                            <VStack align='stretch' spacing={0}>
+                                {unmapped.map((song: string, index: number) => (
                                     <Text key={index} fontSize='sm' color='text.muted' py={1}>
                                         {song}
                                     </Text>
                                 ))}
                             </VStack>
-                        </Box>
-                    ) : (
-                        <Box
-                            bg='bg.card'
-                            border='1px solid'
-                            borderColor='accent.green'
-                            borderRadius='xl'
-                            p={5}
-                            textAlign='center'
-                        >
-                            <Text color='accent.green' fontWeight='semibold' fontSize='sm'>
-                                All songs mapped successfully!
-                            </Text>
                         </Box>
                     )}
 

@@ -6,9 +6,10 @@ type ProjectedSetlistProps = {
     includeTape?: boolean;
     breakupMedleys?: boolean;
     playlistDescription?: string;
+    showSimilarity?: boolean;
 };
 
-export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription }: ProjectedSetlistProps) {
+export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription, showSimilarity = true }: ProjectedSetlistProps) {
     const { setlistMetadata, chosenArtist, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
@@ -39,7 +40,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
             );
 
             const jsonData = await response.json();
-            setPlaylistMetadata(jsonData);
+            setPlaylistMetadata({ ...jsonData, playlistDescription });
             setSetlistLoaded(true);
         } catch (error) {
             // keep error as unknown and log safely
@@ -48,7 +49,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
     };
 
     const allSongs = setlistMetadata?.songs ?? [];
-    const filtered = includeTape ? allSongs : allSongs.filter(s => !s.tape);
+    const filtered = includeTape ? allSongs : allSongs.filter(s => !s.tape && !s.coverArtist);
     const songs = breakupMedleys
         ? filtered.flatMap(s =>
             s.title.includes(' / ')
@@ -64,7 +65,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                 <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide'>
                     {songs.length} song{songs.length !== 1 ? 's' : ''}
                 </Text>
-                {similarity != null && (
+                {showSimilarity && similarity != null && (
                     <Box display='flex' alignItems='baseline' gap={1.5}>
                         <Text fontSize='xs' color='text.muted' textTransform='uppercase' letterSpacing='wide'>
                             Setlist Similarity
@@ -79,6 +80,33 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                     </Box>
                 )}
             </Box>
+            {showSimilarity && similarity != null && (
+                <Box display='flex' alignItems='flex-start' gap={2} mb={3}>
+                    <Box
+                        flexShrink={0}
+                        boxSize='16px'
+                        borderRadius='full'
+                        border='1px solid'
+                        borderColor='text.muted'
+                        display='flex'
+                        alignItems='center'
+                        justifyContent='center'
+                        mt='1px'
+                    >
+                        <Text fontSize='10px' fontWeight='bold' color='text.muted' lineHeight='1'>
+                            i
+                        </Text>
+                    </Box>
+                    <Text fontSize='xs' color='text.muted' lineHeight='tall'>
+                        {similarity >= 70
+                            ? 'This artist plays a pretty consistent set every night. What you see is likely what you\'ll get.'
+                            : similarity >= 40
+                                ? 'This artist switches things up a bit. Your playlist covers the highlights but expect some surprises.'
+                                : 'This artist loves to mix it up. Think of this playlist as a best guess, not a guarantee.'
+                        }
+                    </Text>
+                </Box>
+            )}
             <Box
                 bg='bg.page'
                 borderRadius='lg'

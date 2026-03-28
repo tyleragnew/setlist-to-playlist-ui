@@ -1,6 +1,12 @@
 import { Button, FormControl, Box, Text, Image, Divider, Switch, Stack, Select } from "@chakra-ui/react";
+import { keyframes as emotionKeyframes } from '@emotion/react';
 import { BinarySpinner } from "../components/BinarySpinner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+const pulse = emotionKeyframes`
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+`;
 import { useNavigate } from "react-router-dom";
 import { useListenerContext } from "../context/ListenerContext";
 import { ProjectedSetlist } from "../components/ProjectedSetlist";
@@ -60,6 +66,14 @@ export function SetSetlistMetadata() {
     const [includeTape, setIncludeTape] = useState(true);
     const [breakupMedleys, setBreakupMedleys] = useState(false);
 
+    const lastFetched = useRef<{ mode: SearchMode; numberOfSets: number; selectedYear: number; allSongs: boolean } | null>(null);
+
+    const isDirty = !lastFetched.current
+        || lastFetched.current.mode !== searchMode
+        || lastFetched.current.allSongs !== allSongs
+        || (searchMode === 'recent' && lastFetched.current.numberOfSets !== numberOfSets)
+        || (searchMode === 'year' && lastFetched.current.selectedYear !== selectedYear);
+
     const [showMeta, setShowMeta] = useState<ArtistShowMeta | null>(null);
 
     useEffect(() => {
@@ -77,11 +91,6 @@ export function SetSetlistMetadata() {
             }
         })();
     }, [chosenArtist]);
-
-    // Reset preview when mode changes
-    useEffect(() => {
-        setSetlistLoaded(false);
-    }, [searchMode]);
 
     const fetchData = async () => {
         if (!chosenArtist) return;
@@ -107,6 +116,7 @@ export function SetSetlistMetadata() {
             const jsonData = await response.json();
             setSetlistMetadata(jsonData);
             setSetlistLoaded(true);
+            lastFetched.current = { mode: searchMode, numberOfSets, selectedYear, allSongs };
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -159,11 +169,11 @@ export function SetSetlistMetadata() {
     const buildPlaylistDescription = (): string => {
         switch (searchMode) {
             case 'recent':
-                return `What ${artistName} has been throwing down lately, built from their last ${numberOfSets} shows. Hit play and pretend you're in the front row.`;
+                return `What ${artistName} has been throwing down lately, built from their last ${numberOfSets} shows. Hit play and pretend you're in the front row`;
             case 'tour':
-                return `Every banger from the ${showMeta?.currentTour} tour. This is what ${artistName} is playing right now, your cheat sheet before the show.`;
+                return `Every banger from ${showMeta?.currentTour}. This is what ${artistName} is playing right now, your cheat sheet before the show`;
             case 'year':
-                return `A time capsule from ${selectedYear}. What ${artistName} was playing back then.`;
+                return `${artistName} in ${selectedYear}. A time capsule of what they were playing back then`;
         }
     };
 
@@ -246,7 +256,7 @@ export function SetSetlistMetadata() {
                         <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={3}>
                             Search Mode
                         </Text>
-                        <Box display='flex' gap={2} mb={5}>
+                        <Box display='flex' gap={2} mb={2}>
                             {modeOptions.map((opt) => (
                                 <Box
                                     key={opt.value}
@@ -269,6 +279,31 @@ export function SetSetlistMetadata() {
                                     {opt.label}
                                 </Box>
                             ))}
+                        </Box>
+                        <Box display='flex' alignItems='flex-start' gap={2} mb={5}>
+                            <Box
+                                flexShrink={0}
+                                boxSize='16px'
+                                borderRadius='full'
+                                border='1px solid'
+                                borderColor='text.muted'
+                                display='flex'
+                                alignItems='center'
+                                justifyContent='center'
+                                mt='1px'
+                            >
+                                <Text fontSize='10px' fontWeight='bold' color='text.muted' lineHeight='1'>
+                                    i
+                                </Text>
+                            </Box>
+                            <Text fontSize='xs' color='text.muted' lineHeight='tall'>
+                                {searchMode === 'recent'
+                                    ? 'Builds a setlist from the most recent shows. Great for seeing what the band is playing right now.'
+                                    : searchMode === 'tour'
+                                        ? `Pulls every show from the ${showMeta?.currentTour} tour and finds the songs they keep coming back to.`
+                                        : 'Pick a year and travel back in time. See what the setlist looked like during a specific era.'
+                                }
+                            </Text>
                         </Box>
 
                         {searchMode === 'recent' && (
@@ -393,10 +428,10 @@ export function SetSetlistMetadata() {
                                 <Box display='flex' justifyContent='space-between' alignItems='center'>
                                     <Box>
                                         <Text fontSize='sm' color='text.primary' fontWeight='medium'>
-                                            Include Songs on Tape
+                                            Include Interludes and Covers
                                         </Text>
                                         <Text fontSize='xs' color='text.muted' mt={0.5}>
-                                            Some artists play pre-recorded backing tracks or interludes between songs. Toggle off to exclude these from your playlist.
+                                            Some artists play pre-recorded tracks between songs or perform songs by other artists. Toggle off to keep only original material.
                                         </Text>
                                     </Box>
                                     <Switch colorScheme='brand' isChecked={includeTape} onChange={(e) => setIncludeTape(e.target.checked)} size='md' ml={4} flexShrink={0} />
@@ -424,27 +459,42 @@ export function SetSetlistMetadata() {
                             </Box>
                         </Stack>
 
-                        <Box bg='bg.page' borderRadius='xl' border='1px solid' borderColor='border.subtle' p={4} mb={5}>
-                            <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={2}>
-                                How song order works
-                            </Text>
+                        <Box display='flex' alignItems='flex-start' gap={2} mb={5}>
+                            <Box
+                                flexShrink={0}
+                                boxSize='16px'
+                                borderRadius='full'
+                                border='1px solid'
+                                borderColor='text.muted'
+                                display='flex'
+                                alignItems='center'
+                                justifyContent='center'
+                                mt='1px'
+                            >
+                                <Text fontSize='10px' fontWeight='bold' color='text.muted' lineHeight='1'>
+                                    i
+                                </Text>
+                            </Box>
                             <Text fontSize='xs' color='text.muted' lineHeight='tall'>
-                                Songs are ranked by how frequently they appear across the selected shows. The playlist is then ordered by each song's average position in the setlist, so openers stay at the top and encores land at the end, just like a real show.
+                                Songs are ranked by how frequently they appear across the selected shows. The playlist is ordered by each song's average position in the setlist, so openers stay at the top and encores land at the end, just like a real show.
                             </Text>
                         </Box>
 
-                        <Button
-                            colorScheme='spotify'
-                            size={setlistLoaded ? 'md' : 'lg'}
-                            w='100%'
-                            borderRadius='full'
-                            fontWeight='bold'
-                            onClick={fetchData}
-                            disabled={!chosenArtist || setlistLoading}
-                            variant={setlistLoaded ? 'outline' : 'solid'}
-                        >
-                            {setlistLoading ? 'Loading...' : setlistLoaded ? 'Refresh Setlist' : 'Preview Setlist'}
-                        </Button>
+                        {(!setlistLoaded || isDirty || setlistLoading) && (
+                            <Button
+                                colorScheme='spotify'
+                                size={setlistLoaded ? 'md' : 'lg'}
+                                w='100%'
+                                borderRadius='full'
+                                fontWeight='bold'
+                                onClick={fetchData}
+                                disabled={!chosenArtist || setlistLoading}
+                                variant={setlistLoaded ? 'outline' : 'solid'}
+                                css={setlistLoaded && isDirty && !setlistLoading ? { animation: `${pulse} 2s ease-in-out infinite` } : undefined}
+                            >
+                                {setlistLoading ? 'Loading...' : setlistLoaded ? 'Refresh Setlist' : 'Preview Setlist'}
+                            </Button>
+                        )}
                     </FormControl>
                 </Box>
 
@@ -460,6 +510,7 @@ export function SetSetlistMetadata() {
                             includeTape={includeTape}
                             breakupMedleys={breakupMedleys}
                             playlistDescription={buildPlaylistDescription()}
+                            showSimilarity={!allSongs}
                         />
                     </Box>
                 )}

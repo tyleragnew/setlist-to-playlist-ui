@@ -65,8 +65,8 @@ const theme = extendTheme({
         },
     },
     fonts: {
-        heading: '"Circular", "Inter", Helvetica, Arial, sans-serif',
-        body: '"Circular", "Inter", Helvetica, Arial, sans-serif',
+        heading: '"Outfit", "DM Sans", sans-serif',
+        body: '"DM Sans", sans-serif',
     },
     styles: {
         global: {
@@ -74,6 +74,9 @@ const theme = extendTheme({
                 bg: 'bg.page',
                 color: 'text.primary',
                 transition: 'background-color 0.2s ease, color 0.2s ease',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                letterSpacing: '-0.01em',
             },
         },
     },

@@ -103,7 +103,9 @@ export function ChooseArtist() {
                     ))}
                 </Stack>
             ) : searching ? (
-                <BinarySpinner size='md' fullScreen />
+                <Box pt={12} display='flex' justifyContent='center'>
+                    <BinarySpinner size='md' />
+                </Box>
             ) : artistInput.length > 0 ? (
                 <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
                     No artists found for "{artistInput}"

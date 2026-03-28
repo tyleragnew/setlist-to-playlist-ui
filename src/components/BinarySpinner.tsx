@@ -89,7 +89,7 @@ export function BinarySpinner({ size = 'md', fullScreen = false }: { size?: 'sm'
     const dimension = size === 'sm' ? '160px' : size === 'lg' ? '280px' : '220px';
 
     return (
-        <Box display='flex' justifyContent='center' alignItems='center' {...(fullScreen ? { flex: 1 } : {})}>
+        <Box display='flex' justifyContent='center' alignItems='center' {...(fullScreen ? { flex: 1, minH: dimension } : {})}>
             <Box
                 w={dimension}
                 h={dimension}

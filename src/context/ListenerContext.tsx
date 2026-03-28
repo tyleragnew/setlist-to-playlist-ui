@@ -5,6 +5,8 @@ import { ArtistMetadata } from '../pages/ChooseArtist';
 export type PlaylistMetadata = {
     embedURL?: string | URL;
     unmappedSongs?: string[];
+    trackCount?: number;
+    playlistDescription?: string;
 };
 
 export type SongEntry = {
