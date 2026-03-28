@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { useEffect } from 'react';
 import { BinarySpinner } from '../components/BinarySpinner';
 
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
@@ -8,7 +7,6 @@ const callbackURL = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || `${window.locat
 
 export function Callback() {
     const code = new URLSearchParams(window.location.search).get('code');
-    const [message, setMessage] = useState(code ? 'Completing sign-in...' : 'No code provided');
 
     useEffect(() => {
         if (!code) return;
@@ -51,7 +49,7 @@ export function Callback() {
                 }, 50);
             } catch (err) {
                 console.error('Error exchanging code in callback page', err);
-                setMessage('Sign-in failed. Check console for details.');
+                // Error is logged to console above
             }
         })();
     }, [code]);
