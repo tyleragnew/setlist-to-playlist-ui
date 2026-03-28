@@ -1,4 +1,5 @@
-import { Box, Button, Heading, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { BinarySpinner } from "../components/BinarySpinner";
 import { ThemedHeader } from "../components/ThemedHeader";
 import { useListenerContext } from "../context/ListenerContext";
 import { useNavigate } from "react-router-dom";
@@ -90,20 +91,7 @@ export function ReviewPlaylist() {
                     </Button>
                 </VStack>
             ) : (
-                <Box
-                    display='flex'
-                    justifyContent='center'
-                    alignItems='center'
-                    minH='352px'
-                >
-                    <Spinner
-                        thickness="4px"
-                        speed="0.8s"
-                        emptyColor='border.subtle'
-                        color='accent.green'
-                        size="xl"
-                    />
-                </Box>
+                <BinarySpinner size='md' fullScreen />
             )}
         </Box>
     );

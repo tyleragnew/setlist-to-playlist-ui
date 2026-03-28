@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Box, Text } from '@chakra-ui/react';
+import { BinarySpinner } from '../components/BinarySpinner';
 
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
@@ -54,7 +56,7 @@ export function Callback() {
         })();
     }, [code]);
 
-    return <div>{message}</div>;
+    return <BinarySpinner size='md' fullScreen />;
 }
 
 export default Callback;

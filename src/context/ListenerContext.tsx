@@ -7,8 +7,13 @@ export type PlaylistMetadata = {
     unmappedSongs?: string[];
 };
 
+export type SongEntry = {
+    title: string;
+    coverArtist?: string;
+};
+
 export type SetlistMetadata = {
-    songs?: string[];
+    songs?: SongEntry[];
     similarity?: number;
 };
 

@@ -1,4 +1,5 @@
 import { Box, Input, InputGroup, InputLeftElement, Stack, Text } from "@chakra-ui/react";
+import { BinarySpinner } from "../components/BinarySpinner";
 import { ThemedHeader } from "../components/ThemedHeader";
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
@@ -72,7 +73,7 @@ export function ChooseArtist() {
     }, [artistInput]);
 
     return (
-        <Box mx='auto' pt={8} pb={4} w='100%'>
+        <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
             <ThemedHeader mb={6}>Choose Your Artist</ThemedHeader>
             <InputGroup mb={6} size='lg'>
                 <InputLeftElement pointerEvents='none' color='text.muted' pl={1}>
@@ -101,7 +102,9 @@ export function ChooseArtist() {
                         <ArtistCard key={index} artist={artist} />
                     ))}
                 </Stack>
-            ) : searching ? null : artistInput.length > 0 ? (
+            ) : searching ? (
+                <BinarySpinner size='md' fullScreen />
+            ) : artistInput.length > 0 ? (
                 <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
                     No artists found for "{artistInput}"
                 </Text>

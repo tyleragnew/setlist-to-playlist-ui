@@ -165,6 +165,14 @@ const theme = extendTheme({
                 step: {},
                 indicator: {
                     borderColor: 'border.subtle',
+                    '&[data-status=active]': {
+                        borderColor: 'accent.green',
+                        bg: 'transparent',
+                    },
+                    '&[data-status=complete]': {
+                        borderColor: 'accent.green',
+                        bg: 'accent.green',
+                    },
                 },
             },
         },

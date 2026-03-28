@@ -1,4 +1,5 @@
-import { Button, FormControl, Box, Text, Image, Spinner, Divider, Switch, Stack } from "@chakra-ui/react";
+import { Button, FormControl, Box, Text, Image, Divider, Switch, Stack } from "@chakra-ui/react";
+import { BinarySpinner } from "../components/BinarySpinner";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useListenerContext } from "../context/ListenerContext";
@@ -100,11 +101,7 @@ export function SetSetlistMetadata() {
     }, [chosenArtist, token]);
 
     if (imageLoading) {
-        return (
-            <Box display='flex' justifyContent='center' alignItems='center' minH='300px'>
-                <Spinner thickness="4px" speed="0.8s" emptyColor='border.subtle' color='accent.green' size="xl" />
-            </Box>
-        );
+        return <BinarySpinner size='md' fullScreen />;
     }
 
     return (

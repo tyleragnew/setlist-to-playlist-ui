@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Box, Text, Divider } from "@chakra-ui/react";
-import { useListenerContext } from "../context/ListenerContext";
+import { useListenerContext, SongEntry } from "../context/ListenerContext";
 
 export function ProjectedSetlist() {
-    const { setlistMetadata, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
+    const { setlistMetadata, chosenArtist, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
     const handleClick = () => {
@@ -23,7 +23,10 @@ export function ProjectedSetlist() {
                         'Content-Type': 'application/json',
                         'api-key': `${token}`,
                     },
-                    body: JSON.stringify(setlistMetadata ?? {}),
+                    body: JSON.stringify({
+                        ...setlistMetadata,
+                        artistName: chosenArtist?.artistName,
+                    }),
                 },
             );
 
@@ -70,7 +73,7 @@ export function ProjectedSetlist() {
                 maxH='320px'
                 overflowY='auto'
             >
-                {songs.map((song: string, index: number) => (
+                {songs.map((song: SongEntry, index: number) => (
                     <Box key={index}>
                         <Box
                             display='flex'
@@ -85,7 +88,12 @@ export function ProjectedSetlist() {
                                 {index + 1}
                             </Text>
                             <Text fontSize='sm' color='text.primary' flex='1' noOfLines={1}>
-                                {song}
+                                {song.title}
+                                {song.coverArtist && (
+                                    <Text as='span' fontSize='xs' color='text.muted' ml={2}>
+                                        ({song.coverArtist} cover)
+                                    </Text>
+                                )}
                             </Text>
                         </Box>
                         {index < songs.length - 1 && <Divider borderColor='border.subtle' />}
