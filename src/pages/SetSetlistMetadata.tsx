@@ -48,7 +48,7 @@ function buildYearOptions(beginYear?: number | null, endYear?: number | null): n
 }
 
 export function SetSetlistMetadata() {
-    const { chosenArtist, setSetlistMetadata, token } = useListenerContext();
+    const { chosenArtist, setSetlistMetadata, setlistMetadata, token } = useListenerContext();
     const setStep = useSetStep();
     const navigate = useNavigate();
     useEffect(() => { setStep(1); }, [setStep]);
@@ -296,7 +296,7 @@ export function SetSetlistMetadata() {
                                     i
                                 </Text>
                             </Box>
-                            <Text fontSize='xs' color='text.muted' lineHeight='tall'>
+                            <Text fontSize='xs' color='text.muted' lineHeight='tall' >
                                 {searchMode === 'recent'
                                     ? 'Builds a setlist from the most recent shows. Great for seeing what the band is playing right now.'
                                     : searchMode === 'tour'
@@ -410,7 +410,7 @@ export function SetSetlistMetadata() {
                                         </Box>
                                     ))}
                                 </Box>
-                                <Text fontSize='xs' color='text.muted' mt={2}>
+                                <Text fontSize='xs' color='text.muted' mt={2} >
                                     {allSongs
                                         ? 'Every unique song played across the selected shows will be included.'
                                         : 'Only songs that appeared frequently enough to be on a typical setlist will be included.'
@@ -430,7 +430,7 @@ export function SetSetlistMetadata() {
                                         <Text fontSize='sm' color='text.primary' fontWeight='medium'>
                                             Include Interludes and Covers
                                         </Text>
-                                        <Text fontSize='xs' color='text.muted' mt={0.5}>
+                                        <Text fontSize='xs' color='text.muted' mt={0.5} >
                                             Some artists play pre-recorded tracks between songs or perform songs by other artists. Toggle off to keep only original material.
                                         </Text>
                                     </Box>
@@ -450,7 +450,7 @@ export function SetSetlistMetadata() {
                                         <Text fontSize='sm' color='text.primary' fontWeight='medium'>
                                             Break Up Medleys
                                         </Text>
-                                        <Text fontSize='xs' color='text.muted' mt={0.5}>
+                                        <Text fontSize='xs' color='text.muted' mt={0.5} >
                                             Some setlists group multiple songs into a single medley. Toggle on to split them into individual tracks for your playlist.
                                         </Text>
                                     </Box>
@@ -475,7 +475,7 @@ export function SetSetlistMetadata() {
                                     i
                                 </Text>
                             </Box>
-                            <Text fontSize='xs' color='text.muted' lineHeight='tall'>
+                            <Text fontSize='xs' color='text.muted' lineHeight='tall' >
                                 Songs are ranked by how frequently they appear across the selected shows. The playlist is ordered by each song's average position in the setlist, so openers stay at the top and encores land at the end, just like a real show.
                             </Text>
                         </Box>
@@ -511,6 +511,15 @@ export function SetSetlistMetadata() {
                             breakupMedleys={breakupMedleys}
                             playlistDescription={buildPlaylistDescription()}
                             showSimilarity={!allSongs}
+                            showCountLabel={
+                                setlistMetadata?.showCount
+                                    ? searchMode === 'year'
+                                        ? `Compiled from ${setlistMetadata.showCount} known ${setlistMetadata.showCount === 1 ? 'show' : 'shows'} ${artistName} played in ${selectedYear}`
+                                        : searchMode === 'tour'
+                                            ? `Compiled from ${setlistMetadata.showCount} known ${setlistMetadata.showCount === 1 ? 'show' : 'shows'} on ${showMeta?.currentTour}`
+                                            : `Compiled from the last ${setlistMetadata.showCount} ${setlistMetadata.showCount === 1 ? 'show' : 'shows'}`
+                                    : null
+                            }
                         />
                     </Box>
                 )}

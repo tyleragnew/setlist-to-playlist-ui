@@ -30,7 +30,7 @@ export function ReviewPlaylist() {
                             {chosenArtist?.artistName} Setlist Playlist
                         </Text>
                         <Text fontSize='sm' color='text.muted'>
-                            {trackCount} track{trackCount !== 1 ? 's' : ''} from real setlists, saved to your Spotify and ready to play
+                            {trackCount} track{trackCount !== 1 ? 's' : ''}, saved to your Spotify
                         </Text>
                         {playlistMetadata?.playlistDescription && (
                             <Text fontSize='xs' color='text.muted' mt={1}>

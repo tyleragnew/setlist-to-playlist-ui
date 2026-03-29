@@ -18,6 +18,7 @@ export type SongEntry = {
 export type SetlistMetadata = {
     songs?: SongEntry[];
     similarity?: number;
+    showCount?: number;
 };
 
 export type ListenerContextType = {

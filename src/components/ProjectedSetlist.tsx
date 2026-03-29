@@ -7,9 +7,10 @@ type ProjectedSetlistProps = {
     breakupMedleys?: boolean;
     playlistDescription?: string;
     showSimilarity?: boolean;
+    showCountLabel?: string | null;
 };
 
-export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription, showSimilarity = true }: ProjectedSetlistProps) {
+export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription, showSimilarity = true, showCountLabel = null }: ProjectedSetlistProps) {
     const { setlistMetadata, chosenArtist, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
@@ -97,7 +98,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                             i
                         </Text>
                     </Box>
-                    <Text fontSize='xs' color='text.muted' lineHeight='tall'>
+                    <Text fontSize='xs' color='text.muted' lineHeight='tall' >
                         {similarity >= 70
                             ? 'This artist plays a pretty consistent set every night. What you see is likely what you\'ll get.'
                             : similarity >= 40
@@ -106,6 +107,11 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                         }
                     </Text>
                 </Box>
+            )}
+            {showCountLabel && (
+                <Text fontSize='xs' color='text.muted' mb={3} noOfLines={1}>
+                    {showCountLabel}
+                </Text>
             )}
             <Box
                 bg='bg.page'

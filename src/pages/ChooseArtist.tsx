@@ -1,6 +1,7 @@
 import { Box, Input, InputGroup, InputLeftElement, Stack, Text } from "@chakra-ui/react";
 import { BinarySpinner } from "../components/BinarySpinner";
 import { ThemedHeader } from "../components/ThemedHeader";
+import { TopArtists } from "../components/TopArtists";
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 import { useSetStep } from '../context/StepContext'
@@ -72,6 +73,8 @@ export function ChooseArtist() {
         return () => clearTimeout(debounceTimeout);
     }, [artistInput]);
 
+    const showTopArtists = !artistInput.trim() && listOfArtists.length === 0 && !searching;
+
     return (
         <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
             <ThemedHeader mb={6}>Choose Your Artist</ThemedHeader>
@@ -111,6 +114,18 @@ export function ChooseArtist() {
                     No artists found for "{artistInput}"
                 </Text>
             ) : null}
+            {showTopArtists && (
+                <>
+                    <Box display='flex' alignItems='center' gap={4} my={6}>
+                        <Box flex={1} h='1px' bg='border.subtle' />
+                        <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide'>
+                            Or pick a favorite
+                        </Text>
+                        <Box flex={1} h='1px' bg='border.subtle' />
+                    </Box>
+                    <TopArtists />
+                </>
+            )}
         </Box>
     );
 }
