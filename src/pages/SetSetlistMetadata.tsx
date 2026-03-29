@@ -48,7 +48,7 @@ function buildYearOptions(beginYear?: number | null, endYear?: number | null): n
 }
 
 export function SetSetlistMetadata() {
-    const { chosenArtist, setSetlistMetadata, setlistMetadata, token } = useListenerContext();
+    const { chosenArtist, setChosenArtist, setSetlistMetadata, setlistMetadata, token } = useListenerContext();
     const setStep = useSetStep();
     const navigate = useNavigate();
     useEffect(() => { setStep(1); }, [setStep]);
@@ -143,6 +143,9 @@ export function SetSetlistMetadata() {
                 );
                 const imageUrl = await response.text();
                 setArtistImage(typeof imageUrl === 'string' ? imageUrl : "");
+                if (imageUrl && typeof imageUrl === 'string') {
+                    setChosenArtist(prev => prev ? { ...prev, imageUrl } : prev);
+                }
             } catch (error) {
                 setArtistImage("");
             } finally {
@@ -150,7 +153,7 @@ export function SetSetlistMetadata() {
             }
         }
         fetchArtistImage();
-    }, [chosenArtist, token]);
+    }, [chosenArtist?.artistName, token]);
 
     if (imageLoading) {
         return <BinarySpinner size='md' fullScreen />;

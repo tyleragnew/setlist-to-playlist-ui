@@ -5,6 +5,7 @@ import { StepProvider } from '../context/StepContext'
 import { ChakraProvider } from '@chakra-ui/react'
 import ListenerContext from '../context/ListenerContext'
 
+/* eslint-disable @typescript-eslint/no-empty-function */
 const mockContext = {
     chosenArtist: null,
     setChosenArtist: () => {},

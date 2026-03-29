@@ -35,6 +35,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                         ...setlistMetadata,
                         songs,
                         artistName: chosenArtist?.artistName,
+                        artistImageUrl: chosenArtist?.imageUrl,
                         playlistDescription,
                     }),
                 },

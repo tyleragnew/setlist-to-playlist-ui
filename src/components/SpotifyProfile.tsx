@@ -1,4 +1,5 @@
 import { Box, Text } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 export interface SpotifyProfileProps {
     image?: string;
@@ -6,6 +7,9 @@ export interface SpotifyProfileProps {
 }
 
 export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
+    const navigate = useNavigate();
+    const goHome = () => navigate('/');
+
     return (
         <Box
             display='flex'
@@ -16,7 +20,16 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
             position='relative'
         >
             {/* Desktop: centered title */}
-            <Box display={{ base: 'none', md: 'flex' }} position='absolute' left='50%' transform='translateX(-50%)'>
+            <Box
+                display={{ base: 'none', md: 'flex' }}
+                position='absolute'
+                left='50%'
+                transform='translateX(-50%)'
+                cursor='pointer'
+                onClick={goHome}
+                _hover={{ opacity: 0.8 }}
+                transition='opacity 0.15s ease'
+            >
                 <Text
                     fontSize='2xl'
                     fontWeight='bold'
@@ -38,6 +51,10 @@ export function SpotifyProfile({ image, displayName }: SpotifyProfileProps) {
                 color='accent.green'
                 letterSpacing='tight'
                 fontFamily="'Inter', system-ui, sans-serif"
+                cursor='pointer'
+                onClick={goHome}
+                _hover={{ opacity: 0.8 }}
+                transition='opacity 0.15s ease'
             >
                 Setlist
                 <Text as='span' color='text.primary'>2</Text>

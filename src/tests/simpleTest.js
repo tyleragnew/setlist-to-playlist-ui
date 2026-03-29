@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Simple smoke test that runs with Node (ESM)
 const assert = (cond, msg) => { if (!cond) { console.error('FAIL:', msg); process.exit(1) } }
 

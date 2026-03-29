@@ -20,7 +20,13 @@
       "Bash(xargs ls:*)",
       "Bash(npx tsc:*)",
       "Bash(npx nest:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(unzip -o /tmp/outfit.zip -d /tmp/outfit)",
+      "Bash(node -e \":*)",
+      "Bash(node dist/main.js)",
+      "Bash(lsof -ti:3333)",
+      "Bash(xargs kill:*)",
+      "Bash(grep -r \"playlist\\\\|POST.*playlist\\\\|PUT.*image\" /c/Users/tyler/Documents/Dev --include=*.js --include=*.ts -l)"
     ]
   }
 }

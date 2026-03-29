@@ -77,7 +77,7 @@ export function useAuth() {
         const codeChallenge = await generateCodeChallenge(hashed);
         localStorage.setItem('code_verifier', hashed);
 
-        const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private user-top-read';
+        const scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private user-top-read ugc-image-upload';
         const authUrl = new URL(authorizationEndpoint);
         const params = {
             response_type: 'code',
