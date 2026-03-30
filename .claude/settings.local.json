@@ -26,7 +26,11 @@
       "Bash(node dist/main.js)",
       "Bash(lsof -ti:3333)",
       "Bash(xargs kill:*)",
-      "Bash(grep -r \"playlist\\\\|POST.*playlist\\\\|PUT.*image\" /c/Users/tyler/Documents/Dev --include=*.js --include=*.ts -l)"
+      "Bash(grep -r \"playlist\\\\|POST.*playlist\\\\|PUT.*image\" /c/Users/tyler/Documents/Dev --include=*.js --include=*.ts -l)",
+      "Bash(npx prettier:*)",
+      "Bash(node -e \"const sharp = require\\(''sharp''\\); console.log\\(sharp.versions\\);\")",
+      "Bash(node preview.js)",
+      "Bash(npx jest:*)"
     ]
   }
 }

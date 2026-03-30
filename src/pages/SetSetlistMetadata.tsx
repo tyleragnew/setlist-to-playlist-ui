@@ -171,8 +171,10 @@ export function SetSetlistMetadata() {
 
     const buildPlaylistDescription = (): string => {
         switch (searchMode) {
-            case 'recent':
-                return `What ${artistName} has been throwing down lately, built from their last ${numberOfSets} shows. Hit play and pretend you're in the front row`;
+            case 'recent': {
+                const today = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+                return `What ${artistName} has been throwing down lately, built from their last ${numberOfSets} shows as of ${today}. Hit play and pretend you're in the front row`;
+            }
             case 'tour':
                 return `Every banger from ${showMeta?.currentTour}. This is what ${artistName} is playing right now, your cheat sheet before the show`;
             case 'year':
