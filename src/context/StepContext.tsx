@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react'
 
 type StepContextType = {
     step: number
@@ -8,7 +8,16 @@ type StepContextType = {
 const StepContext = createContext<StepContextType | undefined>(undefined)
 
 export function StepProvider({ children }: { children: React.ReactNode }) {
-    const [step, setStep] = useState<number>(0)
+    const [step, setStepRaw] = useState<number>(0)
+    const prevStep = useRef(step)
+
+    const setStep = useCallback((n: number) => {
+        if (n !== prevStep.current) {
+            prevStep.current = n
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        }
+        setStepRaw(n)
+    }, [])
 
     return (
         <StepContext.Provider value={{ step, setStep }}>

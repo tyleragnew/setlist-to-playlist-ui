@@ -30,7 +30,9 @@
       "Bash(npx prettier:*)",
       "Bash(node -e \"const sharp = require\\(''sharp''\\); console.log\\(sharp.versions\\);\")",
       "Bash(node preview.js)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(npm list:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
