@@ -25,7 +25,8 @@ function App() {
 
   // Scroll to top on route change
   useEffect(() => {
-    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [location]);
 
   // While waiting for auth redirect, render just the background to avoid flash
