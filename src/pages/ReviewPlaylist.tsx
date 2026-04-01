@@ -23,7 +23,26 @@ export function ReviewPlaylist() {
 
     return (
         <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
-            {setlistLoaded ? (
+            {setlistLoaded && playlistMetadata?.error ? (
+                <VStack spacing={5} align='center' pt={16}>
+                    <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight='bold' color='red.400'>
+                        Something went wrong
+                    </Text>
+                    <Text fontSize='sm' color='text.muted' textAlign='center'>
+                        {playlistMetadata.error}
+                    </Text>
+                    <Button
+                        onClick={() => navigate('/')}
+                        colorScheme='spotify'
+                        variant='outline'
+                        borderRadius='full'
+                        size='md'
+                        px={8}
+                    >
+                        Try Again
+                    </Button>
+                </VStack>
+            ) : setlistLoaded ? (
                 <VStack spacing={5} align='stretch'>
                     <Box>
                         <Text fontSize={{ base: 'lg', md: 'xl' }} fontWeight='bold' color='text.primary'>

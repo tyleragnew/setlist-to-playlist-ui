@@ -8,6 +8,7 @@ export type PlaylistMetadata = {
     trackCount?: number;
     playlistDescription?: string;
     isGuest?: boolean;
+    error?: string;
 };
 
 export type SongEntry = {

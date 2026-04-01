@@ -68,22 +68,24 @@ function App() {
                         <Text as='span' color='text.primary'>2</Text>
                         Playlist
                       </Text>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        borderColor='accent.green'
-                        color='accent.green'
-                        borderRadius='full'
-                        fontWeight='semibold'
-                        _hover={{ bg: 'rgba(29,185,84,0.1)' }}
-                        onClick={() => startLogin()}
-                      >
-                        Sign in with Spotify
-                      </Button>
+                      <Box display='flex' flexDirection='column' alignItems='flex-end' gap={1}>
+                        <Button
+                          size='sm'
+                          variant='outline'
+                          borderColor='accent.green'
+                          color='accent.green'
+                          borderRadius='full'
+                          fontWeight='semibold'
+                          _hover={{ bg: 'rgba(29,185,84,0.1)' }}
+                          onClick={() => startLogin()}
+                        >
+                          Sign in with Spotify
+                        </Button>
+                        <Text fontSize='2xs' color='text.secondary' fontStyle='italic' fontWeight='normal' opacity={0.5} pr={2}>
+                          Invite-only during Spotify review
+                        </Text>
+                      </Box>
                     </Box>
-                    <Text fontSize='2xs' color='text.secondary' textAlign='right' fontStyle='italic' fontWeight='normal' mt={-1} mb={2}>
-                      Limited to approved users while Spotify reviews the app
-                    </Text>
                   </>
                 )}
                 <StepHeader />

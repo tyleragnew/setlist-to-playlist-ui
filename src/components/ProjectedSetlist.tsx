@@ -42,11 +42,17 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
             );
 
             const jsonData = await response.json();
+            if (!response.ok) {
+                setPlaylistMetadata({ error: jsonData.message || 'Something went wrong' });
+                setSetlistLoaded(true);
+                return;
+            }
             setPlaylistMetadata({ ...jsonData, playlistDescription });
             setSetlistLoaded(true);
         } catch (error) {
-            // keep error as unknown and log safely
             console.error('Error fetching data:', error);
+            setPlaylistMetadata({ error: 'Something went wrong. Please try again.' });
+            setSetlistLoaded(true);
         }
     };
 
