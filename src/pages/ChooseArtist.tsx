@@ -79,7 +79,24 @@ export function ChooseArtist() {
 
     return (
         <Box mx='auto' pt={8} pb={4} w='100%' display='flex' flexDirection='column' flex={1}>
-            <ThemedHeader mb={6}>Choose Your Artist</ThemedHeader>
+            <ThemedHeader mb={6}>
+                Choose Your Artist
+                <Box as='span' sx={{
+                    '@keyframes ellipsis': {
+                        '0%': { content: '""' },
+                        '25%': { content: '"."' },
+                        '50%': { content: '".."' },
+                        '75%': { content: '"..."' },
+                    },
+                    '&::after': {
+                        content: '"..."',
+                        animation: 'ellipsis 2s steps(1) infinite',
+                        display: 'inline-block',
+                        width: '1.5em',
+                        textAlign: 'left',
+                    },
+                }} />
+            </ThemedHeader>
             <InputGroup mb={6} size='lg'>
                 <InputLeftElement pointerEvents='none' color='text.muted' pl={1}>
                     <SearchIcon />
@@ -115,7 +132,11 @@ export function ChooseArtist() {
                 <Text color='text.muted' textAlign='center' mt={8} fontSize='sm'>
                     No artists found for "{artistInput}"
                 </Text>
-            ) : null}
+            ) : (
+                <Box flex={1} display='flex' alignItems='center' justifyContent='center'>
+                    <BinarySpinner size='md' />
+                </Box>
+            )}
             {showTopArtists && token && (
                 <>
                     <Box display='flex' alignItems='center' gap={4} my={6}>

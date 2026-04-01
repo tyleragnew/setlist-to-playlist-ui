@@ -24,11 +24,12 @@ function App() {
   const [setlistMetadata, setSetlistMetadata] = useState<SetlistMetadata | null>(null);
   const [setlistLoaded, setSetlistLoaded] = useState<boolean>(false);
 
-  // Scroll to top on route change
+  // Scroll to top on route change — use rAF so it fires after the new page lays out
   useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, [location]);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    });
+  }, [location.pathname]);
 
   return (
     <>
