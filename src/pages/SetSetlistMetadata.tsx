@@ -54,8 +54,8 @@ export function SetSetlistMetadata() {
     useEffect(() => { setStep(1); }, [setStep]);
 
     useEffect(() => {
-        if (!token || !chosenArtist) navigate('/', { replace: true });
-    }, [token, chosenArtist, navigate]);
+        if (!chosenArtist) navigate('/', { replace: true });
+    }, [chosenArtist, navigate]);
     const [setlistLoaded, setSetlistLoaded] = useState(false);
     const [setlistLoading, setSetlistLoading] = useState(false);
 
@@ -137,7 +137,7 @@ export function SetSetlistMetadata() {
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            'api-key': `${token}`,
+                            ...(token ? { 'api-key': token } : {}),
                         },
                     }
                 );

@@ -29,7 +29,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'api-key': `${token}`,
+                        ...(token ? { 'api-key': token } : {}),
                     },
                     body: JSON.stringify({
                         ...setlistMetadata,
@@ -158,8 +158,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
             )}
             <Button
                 onClick={handleClick}
-                isDisabled={!token || songs.length === 0}
-                title={!token ? 'Sign in to Spotify to generate playlist' : undefined}
+                isDisabled={songs.length === 0}
                 colorScheme='spotify'
                 size='lg'
                 w='100%'
@@ -167,7 +166,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                 fontWeight='bold'
                 fontSize='md'
             >
-                Generate & Save to Spotify
+                {token ? 'Generate & Save to Spotify' : 'Generate Playlist'}
             </Button>
         </Box>
     );

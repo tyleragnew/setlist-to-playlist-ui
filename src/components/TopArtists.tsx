@@ -17,7 +17,10 @@ export function TopArtists() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!token) return;
+        if (!token) {
+            setLoading(false);
+            return;
+        }
         (async () => {
             try {
                 const res = await fetch(
@@ -67,7 +70,7 @@ export function TopArtists() {
     if (artists.length === 0) return null;
 
     return (
-        <Box mt={8}>
+        <Box>
             <Text fontSize='xs' fontWeight='semibold' color='text.muted' textTransform='uppercase' letterSpacing='wide' mb={4}>
                 Your Top Artists
             </Text>

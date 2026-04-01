@@ -7,6 +7,7 @@ export type PlaylistMetadata = {
     unmappedSongs?: string[];
     trackCount?: number;
     playlistDescription?: string;
+    isGuest?: boolean;
 };
 
 export type SongEntry = {

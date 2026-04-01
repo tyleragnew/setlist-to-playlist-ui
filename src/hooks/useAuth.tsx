@@ -27,6 +27,7 @@ export function useAuth() {
     });
 
     const refreshTimer = useRef<number | null>(null);
+    const refreshInFlight = useRef(false);
 
     const isVitest = typeof import.meta !== 'undefined' && (import.meta as any).vitest;
 
@@ -112,16 +113,8 @@ export function useAuth() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, expiry]);
 
-    useEffect(() => {
-        // Don't redirect if we're on the callback page — let Callback handle the exchange
-        if (window.location.pathname === '/callback') return;
-
-        // If no token on initial mount, start PKCE flow (redirect to Spotify)
-        if (!token) {
-            void startPKCE();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // No longer auto-redirect — guest mode is default.
+    // Authenticated users can opt in via startLogin().
 
     async function exchangeCodeForToken(code: string) {
         const codeVerifier = localStorage.getItem('code_verifier') ?? '';
@@ -154,7 +147,8 @@ export function useAuth() {
     }
 
     async function refreshAccessToken() {
-        if (!refreshToken) return;
+        if (!refreshToken || refreshInFlight.current) return;
+        refreshInFlight.current = true;
         const payload = new URLSearchParams({
             grant_type: 'refresh_token',
             refresh_token: refreshToken,
@@ -174,6 +168,8 @@ export function useAuth() {
         } catch (err) {
             console.error('Error refreshing token', err);
             clearAuth();
+        } finally {
+            refreshInFlight.current = false;
         }
     }
 
@@ -210,6 +206,7 @@ export function useAuth() {
         expiry,
         isAuthenticated: Boolean(token),
         profile,
+        startLogin: startPKCE,
         exchangeCodeForToken,
         refreshAccessToken,
         clearAuth,

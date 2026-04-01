@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChakraProvider, Box, localStorageManager } from '@chakra-ui/react'
+import { ChakraProvider, Box, Button, Text, localStorageManager } from '@chakra-ui/react'
 import { SpotifyProfile } from './components/SpotifyProfile';
 import theme from './theme'
 import { ArtistMetadata, ChooseArtist } from './pages/ChooseArtist'
@@ -10,13 +10,14 @@ import ListenerContext, { PlaylistMetadata, SetlistMetadata } from './context/Li
 import { useAuth } from './hooks/useAuth';
 
 import './App.css'
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { Route, Routes, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ReviewPlaylist } from './pages/ReviewPlaylist';
 import { Callback } from './pages/Callback';
 
 function App() {
   const location = useLocation();
-  const { token, profile } = useAuth();
+  const navigate = useNavigate();
+  const { token, profile, startLogin } = useAuth();
 
   const [chosenArtist, setChosenArtist] = useState<ArtistMetadata | null>(null);
   const [playlistMetadata, setPlaylistMetadata] = useState<PlaylistMetadata | null>(null);
@@ -28,9 +29,6 @@ function App() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [location]);
-
-  // While waiting for auth redirect, render just the background to avoid flash
-  const isRedirecting = !token && location.pathname !== '/callback';
 
   return (
     <>
@@ -49,23 +47,56 @@ function App() {
         <StepProvider>
           <ChakraProvider theme={theme} colorModeManager={localStorageManager}>
             <Box bg='bg.page' minH='100vh' display='flex' flexDirection='column' alignItems='center'>
-              {isRedirecting ? null : (
-                <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
-                  {token && profile && (
-                    <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
-                  )}
-                  <StepHeader />
-                  <Box flex='1' display='flex' flexDirection='column' justifyContent='flex-start' pb={{ base: 20, md: 16 }}>
-                    <Routes>
-                      <Route path="/" element={<ChooseArtist />} />
-                      <Route path="/callback" element={<Callback />} />
-                      <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
-                      <Route path="/playlist" element={<ReviewPlaylist />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </Box>
+              <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
+                {token && profile ? (
+                  <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
+                ) : (
+                  <>
+                    <Box display='flex' justifyContent='space-between' alignItems='center' w='100%' py={3}>
+                      <Text
+                        fontSize={{ base: 'xl', md: '2xl' }}
+                        fontWeight='bold'
+                        color='accent.green'
+                        letterSpacing='tight'
+                        fontFamily="'Inter', system-ui, sans-serif"
+                        cursor='pointer'
+                        onClick={() => navigate('/')}
+                        _hover={{ opacity: 0.8 }}
+                        transition='opacity 0.15s ease'
+                      >
+                        Setlist
+                        <Text as='span' color='text.primary'>2</Text>
+                        Playlist
+                      </Text>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        borderColor='accent.green'
+                        color='accent.green'
+                        borderRadius='full'
+                        fontWeight='semibold'
+                        _hover={{ bg: 'rgba(29,185,84,0.1)' }}
+                        onClick={() => startLogin()}
+                      >
+                        Sign in with Spotify
+                      </Button>
+                    </Box>
+                    <Text fontSize='2xs' color='text.secondary' textAlign='right' fontStyle='italic' fontWeight='normal' mt={-1} mb={2}>
+                      Limited to approved users while Spotify reviews the app
+                    </Text>
+                  </>
+                )}
+                <StepHeader />
+                <Box flex='1' display='flex' flexDirection='column' justifyContent='flex-start' pb={{ base: 20, md: 16 }}>
+                  <Routes>
+                    <Route path="/" element={<ChooseArtist />} />
+                    <Route path="/callback" element={<Callback />} />
+                    <Route path="/setlistMetadata" element={<SetSetlistMetadata />} />
+                    <Route path="/playlist" element={<ReviewPlaylist />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
                 </Box>
-              )}
+              </Box>
             </Box>
           </ChakraProvider>
         </StepProvider>

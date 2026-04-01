@@ -1,15 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { BinarySpinner } from '../components/BinarySpinner';
 
 const clientId = 'd74b3ce0fbf342ecbfc8b32423800fa2';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
 const callbackURL = import.meta.env.VITE_SPOTIFY_REDIRECT_URI || `${window.location.origin}/callback`;
 
+function getInitialError(): string | null {
+    const error = new URLSearchParams(window.location.search).get('error');
+    if (!error) return null;
+    return error === 'access_denied'
+        ? 'Your Spotify account isn\'t on the allowlist for this app yet. You can still use S2P as a guest — no login needed!'
+        : `Spotify returned an error: ${error}`;
+}
+
 export function Callback() {
     const code = new URLSearchParams(window.location.search).get('code');
+    const navigate = useNavigate();
+    const [authError, setAuthError] = useState<string | null>(getInitialError);
 
     useEffect(() => {
-        if (!code) return;
+        if (authError || !code) return;
 
         (async () => {
             try {
@@ -25,6 +37,11 @@ export function Callback() {
                 const res = await fetch(tokenEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: payload });
                 const json = await res.json();
 
+                if (json.error) {
+                    setAuthError('Login failed. You can still use S2P as a guest — no login needed!');
+                    return;
+                }
+
                 if (json.access_token) {
                     localStorage.setItem('access_token', json.access_token);
                 }
@@ -37,22 +54,45 @@ export function Callback() {
                 }
 
                 // remove code param and navigate home so the main app can pick up stored tokens
-                const params = new URLSearchParams(window.location.search);
-                params.delete('code');
-                const newSearch = params.toString();
+                const searchParams = new URLSearchParams(window.location.search);
+                searchParams.delete('code');
+                const newSearch = searchParams.toString();
                 const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
                 window.history.replaceState({}, '', newUrl);
 
-                // Wait for React to update state before redirecting
                 setTimeout(() => {
                     window.location.replace('/');
                 }, 50);
             } catch (err) {
                 console.error('Error exchanging code in callback page', err);
-                // Error is logged to console above
+                setAuthError('Something went wrong during login. You can still use S2P as a guest!');
             }
         })();
-    }, [code]);
+    }, [code, authError]);
+
+    if (authError) {
+        return (
+            <Box mx='auto' pt={16} pb={4} w='100%' maxW='480px' display='flex' flexDirection='column' alignItems='center'>
+                <VStack spacing={5} textAlign='center'>
+                    <Text fontSize='xl' fontWeight='bold' color='text.primary'>
+                        Login Unavailable
+                    </Text>
+                    <Text fontSize='sm' color='text.muted' lineHeight='tall'>
+                        {authError}
+                    </Text>
+                    <Button
+                        onClick={() => navigate('/')}
+                        colorScheme='spotify'
+                        borderRadius='full'
+                        size='lg'
+                        px={8}
+                    >
+                        Continue as Guest
+                    </Button>
+                </VStack>
+            </Box>
+        );
+    }
 
     return <BinarySpinner size='md' fullScreen />;
 }

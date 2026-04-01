@@ -5,6 +5,7 @@ import { TopArtists } from "../components/TopArtists";
 import { useEffect, useState } from "react";
 import { ArtistCard } from "../components/ArtistCard";
 import { useSetStep } from '../context/StepContext'
+import { useListenerContext } from '../context/ListenerContext'
 
 export type ArtistMetadata = {
     artistName: string
@@ -26,6 +27,7 @@ function SearchIcon() {
 export function ChooseArtist() {
 
     const setStep = useSetStep()
+    const { token } = useListenerContext()
     useEffect(() => {
         setStep(0)
     }, [setStep])
@@ -114,7 +116,7 @@ export function ChooseArtist() {
                     No artists found for "{artistInput}"
                 </Text>
             ) : null}
-            {showTopArtists && (
+            {showTopArtists && token && (
                 <>
                     <Box display='flex' alignItems='center' gap={4} my={6}>
                         <Box flex={1} h='1px' bg='border.subtle' />

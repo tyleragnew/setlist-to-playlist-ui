@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 
 export function ReviewPlaylist() {
     const navigate = useNavigate();
-    const { token, setlistLoaded, chosenArtist, playlistMetadata } = useListenerContext();
+    const { setlistLoaded, chosenArtist, playlistMetadata } = useListenerContext();
 
     const setStep = useSetStep()
     useEffect(() => {
@@ -15,8 +15,8 @@ export function ReviewPlaylist() {
     }, [setStep])
 
     useEffect(() => {
-        if (!token || !chosenArtist) navigate('/', { replace: true });
-    }, [token, chosenArtist, navigate])
+        if (!chosenArtist) navigate('/', { replace: true });
+    }, [chosenArtist, navigate])
 
     const trackCount = playlistMetadata?.trackCount ?? 0;
     const unmapped = playlistMetadata?.unmappedSongs ?? [];
@@ -30,7 +30,10 @@ export function ReviewPlaylist() {
                             {chosenArtist?.artistName} Setlist Playlist
                         </Text>
                         <Text fontSize='sm' color='text.muted'>
-                            {trackCount} track{trackCount !== 1 ? 's' : ''}, saved to your Spotify
+                            {trackCount} track{trackCount !== 1 ? 's' : ''}
+                            {playlistMetadata?.isGuest
+                                ? ' — open in Spotify to save'
+                                : ', saved to your Spotify'}
                         </Text>
                         {playlistMetadata?.playlistDescription && (
                             <Text fontSize='xs' color='text.muted' mt={1}>

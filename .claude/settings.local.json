@@ -32,7 +32,18 @@
       "Bash(node preview.js)",
       "Bash(npx jest:*)",
       "Bash(npm list:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(unzip -o /tmp/inter.zip -d /tmp/inter)",
+      "Read(//tmp/**)",
+      "Bash(echo $TEMP)",
+      "Read(//c/Users/tyler/Documents/Dev/setlist-to-playlist-frontend/$TEMP/**)",
+      "Bash(cp /tmp/inter-bold.woff2 \"$TEMP/inter-bold.woff2\")",
+      "Bash(realpath \"$TEMP/inter-bold.woff2\")",
+      "Bash(cp /tmp/inter-bold.woff2 \"C:/Users/tyler/Documents/Dev/setlist-to-playlist/inter-bold.woff2\")",
+      "Bash(find C:/Users/tyler/Documents/Dev/setlist-to-playlist/node_modules/@fontsource/inter -name *.woff -o -name *.ttf -o -name *.woff2)",
+      "Bash(ls:*)",
+      "Bash(npx vite:*)",
+      "Bash(find c:UserstylerDocumentsDevsetlist-to-playlist-frontend -type f -name *favicon* -o -name *icon*)"
     ]
   }
 }
