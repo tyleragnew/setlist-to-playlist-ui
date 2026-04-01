@@ -24,10 +24,19 @@ function App() {
   const [setlistMetadata, setSetlistMetadata] = useState<SetlistMetadata | null>(null);
   const [setlistLoaded, setSetlistLoaded] = useState<boolean>(false);
 
-  // Scroll to top on route change — use rAF so it fires after the new page lays out
+  // Scroll to top on route change — blur any focused input first (dismisses iOS keyboard)
+  // then force scroll reset on all possible scroll containers
   useEffect(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    // Double rAF ensures iOS Safari has fully laid out the new page
     requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      });
     });
   }, [location.pathname]);
 
@@ -47,7 +56,7 @@ function App() {
         }}>
         <StepProvider>
           <ChakraProvider theme={theme} colorModeManager={localStorageManager}>
-            <Box bg='bg.page' minH='100vh' display='flex' flexDirection='column' alignItems='center'>
+            <Box bg='bg.page' minH={{ base: '100dvh', md: '100vh' }} display='flex' flexDirection='column' alignItems='center'>
               <Box w={{ base: '92%', md: '100%' }} maxW='960px' display='flex' flexDirection='column' flex='1' mt={{ base: 4, md: 8 }}>
                 {token && profile ? (
                   <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
