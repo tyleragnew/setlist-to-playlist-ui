@@ -52,10 +52,10 @@ function App() {
                   <SpotifyProfile image={profile.image ?? undefined} displayName={profile.displayName} />
                 ) : (
                   <>
-                    <Box display='flex' justifyContent='space-between' alignItems='center' w='100%' py={3}>
+                    <Box display='flex' justifyContent='space-between' alignItems='flex-start' w='100%' py={3}>
                       <Text
-                        fontSize={{ base: 'xl', md: '2xl' }}
-                        fontWeight='bold'
+                        fontSize={{ base: '1.5rem', md: '1.75rem' }}
+                        fontWeight='800'
                         color='accent.green'
                         letterSpacing='tight'
                         fontFamily="'Inter', system-ui, sans-serif"
@@ -63,6 +63,8 @@ function App() {
                         onClick={() => navigate('/')}
                         _hover={{ opacity: 0.8 }}
                         transition='opacity 0.15s ease'
+                        lineHeight='1'
+                        mt='2px'
                       >
                         Setlist
                         <Text as='span' color='text.primary'>2</Text>
@@ -79,10 +81,13 @@ function App() {
                           _hover={{ bg: 'rgba(29,185,84,0.1)' }}
                           onClick={() => startLogin()}
                         >
-                          Sign in with Spotify
+                          Log in with Spotify
                         </Button>
                         <Text fontSize='2xs' color='text.secondary' fontStyle='italic' fontWeight='normal' opacity={0.5} pr={2}>
-                          Invite-only during Spotify review
+                          Limited beta — contact us for access
+                        </Text>
+                        <Text fontSize='2xs' color='text.secondary' fontStyle='italic' fontWeight='normal' opacity={0.5} pr={2}>
+                          No login required
                         </Text>
                       </Box>
                     </Box>
