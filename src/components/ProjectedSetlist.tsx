@@ -5,12 +5,13 @@ import { useListenerContext, SongEntry } from "../context/ListenerContext";
 type ProjectedSetlistProps = {
     includeTape?: boolean;
     breakupMedleys?: boolean;
+    preferLive?: boolean;
     playlistDescription?: string;
     showSimilarity?: boolean;
     showCountLabel?: string | null;
 };
 
-export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, playlistDescription, showSimilarity = true, showCountLabel = null }: ProjectedSetlistProps) {
+export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, preferLive = false, playlistDescription, showSimilarity = true, showCountLabel = null }: ProjectedSetlistProps) {
     const { setlistMetadata, chosenArtist, token, setSetlistLoaded, setPlaylistMetadata } = useListenerContext();
     const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ export function ProjectedSetlist({ includeTape = true, breakupMedleys = false, p
                         artistName: chosenArtist?.artistName,
                         artistImageUrl: chosenArtist?.imageUrl,
                         playlistDescription,
+                        preferLive,
                     }),
                 },
             );

@@ -65,6 +65,7 @@ export function SetSetlistMetadata() {
     const [allSongs, setAllSongs] = useState(false);
     const [includeTape, setIncludeTape] = useState(true);
     const [breakupMedleys, setBreakupMedleys] = useState(false);
+    const [preferLive, setPreferLive] = useState(false);
 
     const lastFetched = useRef<{ mode: SearchMode; numberOfSets: number; selectedYear: number; allSongs: boolean } | null>(null);
 
@@ -462,6 +463,26 @@ export function SetSetlistMetadata() {
                                     <Switch colorScheme='brand' isChecked={breakupMedleys} onChange={(e) => setBreakupMedleys(e.target.checked)} size='md' ml={4} flexShrink={0} />
                                 </Box>
                             </Box>
+
+                            <Box
+                                bg='bg.page'
+                                borderRadius='xl'
+                                border='1px solid'
+                                borderColor='border.subtle'
+                                p={4}
+                            >
+                                <Box display='flex' justifyContent='space-between' alignItems='center'>
+                                    <Box>
+                                        <Text fontSize='sm' color='text.primary' fontWeight='medium'>
+                                            Prefer Live Versions
+                                        </Text>
+                                        <Text fontSize='xs' color='text.muted' mt={0.5} >
+                                            When available, use live recordings from Spotify instead of studio versions. Falls back to studio if no live version exists.
+                                        </Text>
+                                    </Box>
+                                    <Switch colorScheme='brand' isChecked={preferLive} onChange={(e) => setPreferLive(e.target.checked)} size='md' ml={4} flexShrink={0} />
+                                </Box>
+                            </Box>
                         </Stack>
 
                         <Box display='flex' alignItems='flex-start' gap={2} mb={5}>
@@ -514,6 +535,7 @@ export function SetSetlistMetadata() {
                         <ProjectedSetlist
                             includeTape={includeTape}
                             breakupMedleys={breakupMedleys}
+                            preferLive={preferLive}
                             playlistDescription={buildPlaylistDescription()}
                             showSimilarity={!allSongs}
                             showCountLabel={
