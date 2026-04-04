@@ -44,7 +44,8 @@
       "Bash(ls:*)",
       "Bash(npx vite:*)",
       "Bash(find c:UserstylerDocumentsDevsetlist-to-playlist-frontend -type f -name *favicon* -o -name *icon*)",
-      "Bash(NO_COLOR=1 node -e \"const { Logger } = require\\(''@nestjs/common''\\); const l = new Logger\\(''Test''\\); l.log\\(''hello world''\\);\")"
+      "Bash(NO_COLOR=1 node -e \"const { Logger } = require\\(''@nestjs/common''\\); const l = new Logger\\(''Test''\\); l.log\\(''hello world''\\);\")",
+      "Bash(node scripts/generate-og-image.js)"
     ]
   }
 }

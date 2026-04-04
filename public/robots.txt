@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://setlist2playlist.app/sitemap.xml
